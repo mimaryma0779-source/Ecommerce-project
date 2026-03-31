@@ -1,0 +1,474 @@
+// ══════════ VARIABLES GLOBALES ══════════
+let currentCatFilter = 'Tout';
+let cart = [];
+let wishlist = [];
+let compareList = [];
+let loggedInUser = null;
+let currentProduct = null; currentQty = 1;
+
+let currentRating = 0, promoApplied = false;
+
+// ══════════ DATA (BASE DE DONNÉES) ══════════
+const products = [
+    { id:0, name:"ASUS ProArt Display 4K", cat:"Écrans", img:"ASUS ProArt Display 4K.jpg", price:749900, oldPrice:849900, rating:4.8, ratingCount:142, badge:"new", stock:true,
+      specs:"32\" IPS 4K UHD · 60Hz · HDR600",
+      desc:"Moniteur de création professionnelle avec une précision de couleur exceptionnelle.",
+      specItems:{Résolution:"3840×2160", Dalle:"IPS Nano", Taux:"60 Hz", Luminosité:"600 nits"},
+      reviews:[{name:"Amine", stars:5, text:"Couleurs incroyables !"}]},
+    { id:1, name:"Samsung Odyssey G7", cat:"Écrans", img:"Samsung Odyssey G7.jpg", price:489900, rating:4.6, ratingCount:89, badge:null, stock:true,
+      specs:"27\" VA Curved 1440p · 240Hz",
+      desc:"Écran gaming courbé 1000R pour une immersion totale.",
+      specItems:{Résolution:"2560×1440", Dalle:"VA Curved", Taux:"240 Hz", Temps:"1ms"},
+      reviews:[]},
+    { id:2, name:"Keychron Q3 Pro", cat:"Périphériques", img:"Keychron Q3 Pro.jpg", price:184900, rating:4.9, ratingCount:204, badge:"new", stock:true,
+      specs:"TKL · Hot-swap · Gateron G Pro Brown",
+      desc:"Clavier mécanique premium sans fil en aluminium.",
+      specItems:{Format:"TKL (80%)", Switch:"G Pro Brown", Connexion:"Bluetooth / USB-C"},
+      reviews:[]},
+    { id:3, name:"Logitech MX Master 3S", cat:"Périphériques", img:"Logitech MX Master 3S.jpg", price:84900, oldPrice:99900, rating:4.7, ratingCount:512, badge:"promo", stock:true,
+      specs:"8000 DPI · Silencieuse",
+      desc:"La souris de productivité ultime pour les créateurs.",
+      specItems:{DPI:"8000", Capteur:"Laser Darkfield", Batterie:"70 jours"},
+      reviews:[]},
+    { id:4, name:"GeForce RTX 4070 Super", cat:"GPU", img:"GeForce RTX 4070 Super.jpg", price:629900, oldPrice:699900, rating:4.8, ratingCount:178, badge:"promo", stock:true,
+      specs:"12 GB GDDR6X · DLSS 3",
+      desc:"Puissance graphique incroyable pour le gaming 1440p.",
+      specItems:{VRAM:"12 GB", Architecture:"Ada Lovelace", Consommation:"220W"},
+      reviews:[]},
+    { id:5, name:"AMD Ryzen 9 7950X", cat:"Processeurs", img:"AMD Ryzen 9 7950X.jpg", price:549900, rating:4.9, ratingCount:93, badge:null, stock:true,
+      specs:"16 cœurs · 32 threads · 5.7GHz",
+      desc:"Le processeur le plus puissant pour le multi-tâches.",
+      specItems:{Cœurs:"16", Threads:"32", Socket:"AM5"},
+      reviews:[]},
+    { id:6, name:"Samsung 990 Pro 2 TB", cat:"Stockage", img:"Samsung 990 Pro 2 TB.jpg", price:149900, rating:4.8, ratingCount:341, badge:"new", stock:true,
+      specs:"NVMe PCIe 4.0 · 7450 Mo/s",
+      desc:"Vitesse de transfert ultra-rapide pour les pros.",
+      specItems:{Vitesse:"7450 Mo/s", Interface:"PCIe Gen4 x4", Capacité:"2 To"},
+      reviews:[]},
+    { id:7, name:"G.Skill Trident Z5 Neo", cat:"RAM", img:"G.Skill Trident Z5 Neo.jpg", price:134900, rating:4.7, ratingCount:167, badge:null, stock:true,
+      specs:"32 GB (2×16) · DDR5-6000",
+      desc:"Mémoire vive optimisée pour AMD Expo.",
+      specItems:{Capacité:"32 GB", Type:"DDR5", Fréquence:"6000 MHz"},
+      reviews:[]},
+];
+
+
+
+// ══ AUTH ══
+function openAuthModal() {
+  if (loggedInUser) { showToast('👋 Déjà connecté en tant que ' + loggedInUser); return; }
+  switchAuthTab('login');
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuthModal() {
+  document.getElementById('authModal').classList.remove('open');
+}
+function switchAuthTab(tab) {
+  document.getElementById('loginForm').classList.toggle('active', tab==='login');
+  document.getElementById('registerForm').classList.toggle('active', tab==='register');
+  document.getElementById('loginTab').classList.toggle('active', tab==='login');
+  document.getElementById('registerTab').classList.toggle('active', tab==='register');
+  document.getElementById('authTitle').textContent = tab==='login' ? 'Se Connecter' : 'Créer un compte';
+}
+function loginUser() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if (!email || !pass) { showToast('⚠️ Remplissez tous les champs !'); return; }
+  loggedInUser = email.split('@')[0];
+  updateConnectBtn();
+  closeAuthModal();
+  showToast('✓ Connexion réussie ! Bienvenue ' + loggedInUser + ' 👋');
+}
+function registerUser() {
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const phone = document.getElementById('regPhone').value.trim();
+  const address = document.getElementById('regAddress').value.trim();
+  const birthday = document.getElementById('regBirthday').value;
+  if (!name || !email || !pass || !phone || !address || !birthday) { showToast('⚠️ Remplissez tous les champs !'); return; }
+  loggedInUser = name.split(' ')[0];
+  updateConnectBtn();
+  closeAuthModal();
+  showToast('🎉 Compte créé ! Bienvenue ' + loggedInUser + ' !');
+}
+function updateConnectBtn() {
+  const btn = document.getElementById('connectBtn');
+  const icon = document.getElementById('connectIcon');
+  const text = document.getElementById('connectText');
+  if (loggedInUser) {
+    btn.classList.add('logged-in');
+    icon.textContent = '✓';
+    text.textContent = loggedInUser;
+    btn.onclick = () => { loggedInUser = null; updateConnectBtn(); showToast('👋 Déconnecté'); };
+  } else {
+    btn.classList.remove('logged-in');
+    icon.textContent = '👤';
+    text.textContent = 'Connexion';
+    btn.onclick = openAuthModal;
+  }
+}
+document.getElementById('authModal').addEventListener('click', e => { if(e.target===document.getElementById('authModal')) closeAuthModal(); });
+
+// ══ NAVIGATION ══
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (page==='cart') renderCart();
+  if (page==='catalog') renderProducts();
+  if (page==='wishlist') renderWishlist();
+  if (page==='compare') renderCompare();
+}
+function setActive(btn) {
+  document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+
+// ══════════ CATALOGUE ══════════
+function filterCat(cat) {
+    currentCatFilter = cat;
+    // Met à jour les boutons radio du HTML
+    const map = {'Tout':'c-all','Écrans':'c-ecr','Processeurs':'c-cpu','Périphériques':'c-per','GPU':'c-gpu','Stockage':'c-sto','RAM':'c-ram'};
+    if(map[cat]) document.getElementById(map[cat]).checked = true;
+    renderProducts();
+}
+
+function renderProducts() {
+    const grid = document.getElementById('prodGrid');
+    if(!grid) return;
+
+    const q = (document.getElementById('searchIn')?.value || '').toLowerCase();
+    const sort = document.getElementById('sortSel')?.value || 'default';
+    const minP = parseFloat(document.getElementById('minP')?.value) || 0;
+    const maxP = parseFloat(document.getElementById('maxP')?.value) || Infinity;
+
+    let list = products.filter(p => {
+        if (currentCatFilter !== 'Tout' && p.cat !== currentCatFilter) return false;
+        if (q && !p.name.toLowerCase().includes(q)) return false;
+        if (p.price < minP || p.price > maxP) return false;
+        return true;
+    });
+
+    if (sort === 'price-asc') list.sort((a,b) => a.price - b.price);
+    else if (sort === 'price-desc') list.sort((a,b) => b.price - a.price);
+
+    document.getElementById('resCnt').textContent = `${list.length} produit(s)`;
+
+    grid.innerHTML = list.map(p => {
+        const disc = p.oldPrice ? Math.round((1 - p.price / p.oldPrice) * 100) : 0;
+        const isWished = wishlist.includes(p.id);
+        const isCmp = compareList.find(c => c.id === p.id);
+
+        return `
+        <div class="product-card" onclick="showDetail(${p.id})">
+            <div class="prod-img">
+                <img src="${p.img}" alt="${p.name}">
+                <div class="badges-wrap">
+                    ${p.badge === 'new' ? '<span class="badge b-new">NOUVEAU</span>' : ''}
+                    ${p.badge === 'promo' ? `<span class="badge b-promo">−${disc}%</span>` : ''}
+                </div>
+                <div class="compare-chk ${isCmp ? 'selected' : ''}" onclick="event.stopPropagation();toggleCompare(${p.id})">${isCmp ? '✓' : '⊕'}</div>
+                <div class="wishlist-btn ${isWished ? 'active' : ''}" onclick="event.stopPropagation();toggleWish(${p.id})">${isWished ? '♥' : '♡'}</div>
+            </div>
+            <div class="prod-body">
+                <div class="prod-cat">${p.cat}</div>
+                <div class="prod-name">${p.name}</div>
+                <div class="prod-specs">${p.specs}</div>
+                <div class="prod-footer">
+                    <div class="prod-price">${p.price.toLocaleString('fr-DZ')} DA</div>
+                    <button class="add-btn" onclick="event.stopPropagation();addToCart(${p.id},this)">+</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+
+// ══ DETAIL ══
+function showDetail(id) {
+  currentProduct = products.find(p=>p.id===id);
+  currentQty = 1;
+  if (!currentProduct) return;
+  const p = currentProduct;
+  document.getElementById('dImg').textContent = p.icon;
+  document.getElementById('dCat').textContent = p.cat;
+  document.getElementById('dTitle').textContent = p.name;
+  document.getElementById('dRatingText').textContent = `${p.rating}/5 — ${p.ratingCount} avis vérifiés`;
+  document.getElementById('dPrice').textContent = p.price.toLocaleString('fr-DZ') + ' DA';
+  document.getElementById('bc-cat').textContent = p.cat;
+  document.getElementById('bc-name').textContent = p.name;
+  document.getElementById('dQty').textContent = 1;
+  document.getElementById('avgNum').textContent = p.rating;
+  document.getElementById('avgCount').textContent = `${p.ratingCount} avis`;
+  document.getElementById('modalProductName').textContent = p.name;
+  const oldEl = document.getElementById('dOld');
+  const discEl = document.getElementById('dDisc');
+  if (p.oldPrice) { oldEl.textContent = p.oldPrice.toLocaleString('fr-DZ')+' DA'; discEl.textContent = '-'+Math.round((1-p.price/p.oldPrice)*100)+'%'; discEl.style.display='block'; }
+  else { oldEl.textContent=''; discEl.style.display='none'; }
+  document.getElementById('dDesc').textContent = p.desc;
+  document.getElementById('dSpecs').innerHTML = Object.entries(p.specItems).map(([k,v])=>`<div class="spec-item"><div class="spec-k">${k}</div><div class="spec-v">${v}</div></div>`).join('');
+  const wishBtn = document.getElementById('dWishBtn');
+  wishBtn.classList.toggle('active', wishlist.includes(p.id));
+  wishBtn.textContent = wishlist.includes(p.id) ? '♥' : '♡';
+  const thumbEmojis = [p.icon, '📷', '📐', '🔌'];
+  document.getElementById('dThumbs').innerHTML = thumbEmojis.map((e,i)=>`<div class="thumb ${i===0?'active':''}" onclick="document.getElementById('dImg').textContent='${e}';this.parentElement.querySelectorAll('.thumb').forEach(t=>t.classList.remove('active'));this.classList.add('active')">${e}</div>`).join('');
+  document.getElementById('dAddBtn').onclick = () => { for(let i=0;i<currentQty;i++) addToCart(p.id,null); };
+  renderReviews(p);
+  renderRatingBars(p);
+  nav('detail');
+}
+function changeQty(d) { currentQty = Math.max(1, Math.min(99, currentQty+d)); document.getElementById('dQty').textContent = currentQty; }
+function scrollToReviews() { document.getElementById('reviewsSection').scrollIntoView({behavior:'smooth'}); }
+
+// ══ REVIEWS ══
+function renderReviews(p) {
+  document.getElementById('reviewCards').innerHTML = p.reviews.map(r=>`
+    <div class="review-card">
+      <div class="review-top">
+        <div><div class="reviewer-name">${r.name}</div><div class="review-date">${r.date}</div></div>
+        <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+      </div>
+      <div class="review-text">${r.text}</div>
+      <div class="review-helpful"><span>${r.helpful} personnes ont trouvé cet avis utile</span>
+        <button class="helpful-btn" onclick="this.textContent='✓ Utile';this.disabled=true;this.style.background='rgba(167,255,235,0.3)';this.style.color='var(--teal)'">👍 Utile</button>
+      </div>
+    </div>`).join('');
+}
+function renderRatingBars(p) {
+  const d = [0,2,5,15,38,40];
+  document.getElementById('ratingBars').innerHTML = [5,4,3,2,1].map(s=>`
+    <div class="rbar-row"><span class="rbar-lbl">${s}★</span><div class="rbar-track"><div class="rbar-fill" style="width:${d[s]}%"></div></div><span class="rbar-cnt">${d[s]}%</span></div>`).join('');
+}
+function openReviewModal() { currentRating=0; document.getElementById('reviewName').value=''; document.getElementById('reviewText').value=''; document.querySelectorAll('.star-opt').forEach(s=>s.classList.remove('active')); document.getElementById('reviewModal').classList.add('open'); }
+function setRating(val) { currentRating=val; document.querySelectorAll('.star-opt').forEach(s=>s.classList.toggle('active',parseInt(s.dataset.v)<=val)); }
+function submitReview() {
+  const name = document.getElementById('reviewName').value.trim();
+  const text = document.getElementById('reviewText').value.trim();
+  if (!name || !text || !currentRating) { showToast('⚠️ Remplissez tous les champs'); return; }
+  currentProduct.reviews.unshift({name,stars:currentRating,date:"Aujourd'hui",text,helpful:0});
+  currentProduct.ratingCount++;
+  renderReviews(currentProduct);
+  closeModal('reviewModal');
+  showToast('✓ Avis publié, merci !');
+}
+
+// ══ CART ══
+function addToCart(id, btn) {
+  const p = products.find(pr=>pr.id===id);
+  if (!p) return;
+  const ex = cart.find(i=>i.id===id);
+  if (ex) ex.qty++; else cart.push({...p,qty:1});
+  updateCartCount();
+  showToast('✓ ' + p.name + ' ajouté au panier');
+  if (btn) { btn.textContent='✓'; btn.classList.add('added'); setTimeout(()=>{btn.textContent='+';btn.classList.remove('added');},1200); }
+}
+function updateCartCount() {
+  const t = cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartCount').textContent = t;
+}
+function renderCart() {
+  const c = document.getElementById('cartItems');
+  if (!cart.length) {
+    c.innerHTML=`<div class="cart-empty"><span class="empty-icon">🛒</span><p style="font-size:17px;font-weight:500;margin-bottom:6px">Votre panier est vide</p><small>Explorez notre catalogue</small><br><br><button class="btn btn-dark" onclick="nav('catalog')">Voir le catalogue →</button></div>`;
+    document.getElementById('sumSub').textContent='0 DA'; document.getElementById('sumTVA').textContent='0 DA'; document.getElementById('sumTotal').textContent='0 DA';
+    return;
+  }
+  c.innerHTML = cart.map((item,i)=>`
+    <div class="cart-item">
+      <div class="ci-img">${item.icon}</div>
+      <div class="ci-info"><div class="ci-name">${item.name}</div><div class="ci-cat">${item.cat}</div></div>
+      <div class="ci-qty">
+        <button class="cq-btn" onclick="updateQty(${i},-1)">−</button>
+        <div class="cq-num">${item.qty}</div>
+        <button class="cq-btn" onclick="updateQty(${i},1)">+</button>
+      </div>
+      <div class="ci-price">${(item.price*item.qty).toLocaleString('fr-DZ')} DA</div>
+      <button class="rm-btn" onclick="removeItem(${i})">✕</button>
+    </div>`).join('');
+  updateSummary();
+}
+function updateSummary() {
+  const sub = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const disc = promoApplied ? Math.round(sub*.1) : 0;
+  const tva = Math.round((sub-disc)*.19);
+  document.getElementById('sumSub').textContent = sub.toLocaleString('fr-DZ')+' DA';
+  document.getElementById('sumTVA').textContent = tva.toLocaleString('fr-DZ')+' DA';
+  document.getElementById('sumTotal').textContent = (sub-disc+tva).toLocaleString('fr-DZ')+' DA';
+  const dr = document.getElementById('discRow');
+  if (promoApplied) { dr.style.display='flex'; document.getElementById('discAmt').textContent='-'+disc.toLocaleString('fr-DZ')+' DA'; }
+  else dr.style.display='none';
+}
+function updateQty(i,d) { cart[i].qty=Math.max(1,cart[i].qty+d); updateCartCount(); renderCart(); }
+function removeItem(i) { cart.splice(i,1); updateCartCount(); renderCart(); }
+function applyPromo() {
+  const code = document.getElementById('promoIn').value.trim().toUpperCase();
+  if (code==='DIGITAL10') { promoApplied=true; updateSummary(); showToast('🎁 Code DIGITAL10 appliqué — −10% !'); }
+  else showToast('❌ Code promo invalide');
+}
+function checkout() {
+  if (!cart.length) { showToast('⚠️ Votre panier est vide'); return; }
+  const orderN = 'DS-2026-'+Math.floor(1000+Math.random()*9000);
+  document.getElementById('orderNum').textContent = orderN;
+  document.getElementById('trackIn').value = orderN;
+  cart=[]; promoApplied=false; updateCartCount(); renderCart();
+  document.getElementById('successModal').classList.add('open');
+}
+
+// ══ WISHLIST ══
+function toggleWish(id) {
+  const idx = wishlist.indexOf(id);
+  if (idx>-1) { wishlist.splice(idx,1); showToast('♡ Retiré de la wishlist'); }
+  else { wishlist.push(id); showToast('♥ Ajouté à la wishlist'); }
+  updateWishCount(); renderProducts();
+}
+function toggleWishDetail() {
+  if (!currentProduct) return;
+  toggleWish(currentProduct.id);
+  const btn = document.getElementById('dWishBtn');
+  const active = wishlist.includes(currentProduct.id);
+  btn.classList.toggle('active',active); btn.textContent = active?'♥':'♡';
+}
+function updateWishCount() {
+  const el = document.getElementById('wishCount');
+  el.textContent = wishlist.length;
+  el.style.display = wishlist.length ? 'flex' : 'none';
+}
+function renderWishlist() {
+  const sub = document.getElementById('wishSubtitle');
+  const grid = document.getElementById('wishGrid');
+  sub.textContent = wishlist.length+' produit'+(wishlist.length>1?'s':'');
+  if (!wishlist.length) { grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:60px;color:var(--muted)"><div style="font-size:48px;margin-bottom:12px">♡</div><div style="font-size:16px;font-weight:500">Votre wishlist est vide</div><div style="margin-top:10px"><button class="btn btn-dark" onclick="nav('catalog')">Explorer le catalogue</button></div></div>`; return; }
+  grid.innerHTML = products.filter(p=>wishlist.includes(p.id)).map(p=>`
+    <div class="product-card" onclick="showDetail(${p.id})">
+      <div class="prod-img">${p.icon}
+        <div class="wishlist-btn active" onclick="event.stopPropagation();toggleWish(${p.id});renderWishlist()">♥</div>
+      </div>
+      <div class="prod-body">
+        <div class="prod-cat">${p.cat}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-footer">
+          <div class="prod-price">${p.price.toLocaleString('fr-DZ')} DA</div>
+          <button class="add-btn" onclick="event.stopPropagation();addToCart(${p.id},this)">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ══ COMPARATOR ══
+function toggleCompare(id) {
+  const p = products.find(pr=>pr.id===id);
+  if (!p) return;
+  const idx = compareList.findIndex(c=>c.id===id);
+  if (idx>-1) { compareList.splice(idx,1); showToast('⊖ Retiré du comparateur'); }
+  else { if (compareList.length>=3) { showToast('⚠️ Maximum 3 produits'); return; } compareList.push(p); showToast('⊕ Ajouté au comparateur'); }
+  updateCompareBar(); renderProducts();
+}
+function updateCompareBar() {
+  const bar = document.getElementById('compareBar');
+  const hint = document.getElementById('compareHint');
+  document.getElementById('cmpCount').textContent = compareList.length;
+  if (compareList.length>0) { bar.classList.add('visible'); hint.style.display='flex'; }
+  else { bar.classList.remove('visible'); hint.style.display='none'; }
+  document.getElementById('cbSlots').innerHTML = [0,1,2].map(i=>{
+    const p = compareList[i];
+    return p ? `<div class="cb-slot"><span class="cb-slot-icon">${p.icon}</span><span class="cb-slot-name">${p.name}</span><button class="cb-slot-rm" onclick="toggleCompare(${p.id})">✕</button></div>` : `<div class="cb-slot empty"><span style="font-size:18px;margin-right:6px">+</span> Ajouter</div>`;
+  }).join('');
+}
+function clearCompare() { compareList=[]; updateCompareBar(); renderProducts(); showToast('Comparateur vidé'); }
+function renderCompare() {
+  const content = document.getElementById('compareContent');
+  if (!compareList.length) { content.innerHTML=`<div class="compare-empty"><div style="font-size:48px;margin-bottom:12px">⚖️</div><div style="font-size:16px;font-weight:500;margin-bottom:8px">Aucun produit à comparer</div><div style="font-size:13.5px;margin-bottom:20px">Sélectionnez jusqu'à 3 produits</div><button class="btn btn-dark" onclick="nav('catalog');setActive(document.querySelectorAll('.nav-link')[1])">Aller au catalogue</button></div>`; return; }
+  const allSpecKeys = [...new Set(compareList.flatMap(p=>Object.keys(p.specItems)))];
+  const minPrice = Math.min(...compareList.map(p=>p.price));
+  const maxRating = Math.max(...compareList.map(p=>p.rating));
+  const headers = compareList.map(p=>`<th><div class="ct-product-header"><span class="ct-icon">${p.icon}</span>${p.name}<div class="ct-price">${p.price.toLocaleString('fr-DZ')} DA</div><div><button class="ct-remove" onclick="toggleCompare(${p.id});renderCompare()">Retirer</button></div><div style="margin-top:8px"><button class="btn btn-teal" style="font-size:12px;padding:7px 14px" onclick="addToCart(${p.id},null)">Ajouter au panier</button></div></div></th>`).join('');
+  const rows = [
+    `<tr><td>Prix</td>${compareList.map(p=>`<td class="${p.price===minPrice?'best-val':''}">${p.price.toLocaleString('fr-DZ')} DA</td>`).join('')}</tr>`,
+    `<tr><td>Note</td>${compareList.map(p=>`<td class="${p.rating===maxRating?'best-val':''}">${p.rating}★ (${p.ratingCount})</td>`).join('')}</tr>`,
+    `<tr><td>Catégorie</td>${compareList.map(p=>`<td>${p.cat}</td>`).join('')}</tr>`,
+    ...allSpecKeys.map(k=>`<tr><td>${k}</td>${compareList.map(p=>`<td>${p.specItems[k]||'—'}</td>`).join('')}</tr>`)
+  ];
+  content.innerHTML = `<div class="compare-table-wrap"><table class="compare-table"><thead><tr><th>Caractéristique</th>${headers}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
+}
+
+// ══ ORDER TRACKING ══
+function trackOrder() {
+  const num = document.getElementById('trackIn').value.trim();
+  if (!num) return;
+  const result = document.getElementById('trackResult');
+  result.style.display='block';
+  result.innerHTML=`<div style="text-align:center;padding:40px;color:var(--muted)">🔍 Recherche en cours…</div>`;
+  setTimeout(() => { result.innerHTML=buildTrackHTML(num); setTimeout(initMap,200); animateStepFill(); }, 900);
+}
+function buildTrackHTML(num) {
+  const steps = [{lbl:'Commande confirmée',icon:'✓',time:'09:14',done:true,curr:false},{lbl:'Préparation',icon:'📦',time:'11:30',done:true,curr:false},{lbl:'En transit',icon:'🚚',time:"Aujourd'hui",done:false,curr:true},{lbl:'En livraison',icon:'🏍️',time:'Demain',done:false,curr:false},{lbl:'Livré',icon:'🏠',time:'Prévu 14h',done:false,curr:false}];
+  const stepsHtml = steps.map(s=>`<div class="step ${s.done?'done':''} ${s.curr?'current':''}"><div class="step-dot">${s.icon}</div><div class="step-lbl">${s.lbl}</div><div class="step-time">${s.time}</div></div>`).join('');
+  const tlItems = [{icon:'✓',cls:'tl-done',title:'Commande passée',desc:'Paiement vérifié et commande enregistrée',time:'09:14'},{icon:'📦',cls:'tl-done',title:'Préparation terminée',desc:'Votre colis a été emballé et étiqueté',time:'11:30'},{icon:'🚚',cls:'tl-current',title:'En route — Centre de tri Alger',desc:'Votre colis a quitté notre entrepôt',time:'14:05'},{icon:'🏍️',cls:'tl-pending',title:'Livreur assigné',desc:'Un livreur sera assigné demain matin',time:'Demain'},{icon:'🏠',cls:'tl-pending',title:'Livraison à domicile',desc:'Livraison prévue entre 9h et 17h',time:'Demain'}];
+  return `<div class="track-order-card"><div class="order-head"><div><div class="order-num">#${num}</div><div class="order-name">RTX 4070 Super + Keychron Q3 Pro</div></div><div class="order-status status-transit">🚚 En transit</div></div><div class="steps" id="stepsContainer"><div class="step-fill" id="stepFill" style="width:0%"></div>${stepsHtml}</div></div>
+  <div class="map-section"><h3>📍 Position en temps réel</h3><div class="map-container"><div id="liveMap"></div><div class="map-overlay"><div class="map-info-card"><div class="map-info-title">🚚 Colis en transit</div><div class="map-info-addr">Centre de tri — Route nationale 5, Alger</div></div><div class="eta-pill"><div class="eta-lbl">ETA livraison</div><div class="eta-time">Demain 11h</div></div></div></div></div>
+  <div class="track-order-card"><h3 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;margin-bottom:20px">Historique détaillé</h3><div class="timeline">${tlItems.map(t=>`<div class="tl-item"><div class="tl-icon ${t.cls}">${t.icon}</div><div class="tl-text"><div class="tl-title" style="${t.cls==='tl-pending'?'color:var(--muted)':''}">${t.title}</div><div class="tl-desc">${t.desc}</div></div><div class="tl-time">${t.time}</div></div>`).join('')}</div></div>`;
+}
+function animateStepFill() { const f=document.getElementById('stepFill'); if(f) setTimeout(()=>f.style.width='40%',100); }
+function initMap() {
+  const mapEl = document.getElementById('liveMap');
+  if (!mapEl) return;
+  mapEl.innerHTML=`<svg viewBox="0 0 800 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block">
+    <defs><linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e0faf2"/><stop offset="100%" stop-color="#b2f0e0"/></linearGradient><filter id="sh"><feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.2"/></filter></defs>
+    <rect width="800" height="360" fill="url(#skyG)"/>
+    <g stroke="#b2e0d0" stroke-width="0.5"><line x1="0" y1="60" x2="800" y2="60"/><line x1="0" y1="120" x2="800" y2="120"/><line x1="0" y1="180" x2="800" y2="180"/><line x1="0" y1="240" x2="800" y2="240"/><line x1="0" y1="300" x2="800" y2="300"/><line x1="100" y1="0" x2="100" y2="360"/><line x1="200" y1="0" x2="200" y2="360"/><line x1="300" y1="0" x2="300" y2="360"/><line x1="400" y1="0" x2="400" y2="360"/><line x1="500" y1="0" x2="500" y2="360"/><line x1="600" y1="0" x2="600" y2="360"/><line x1="700" y1="0" x2="700" y2="360"/></g>
+    <path d="M 60 300 Q 200 220 350 200 Q 480 185 580 160 Q 680 140 740 100" stroke="#94a3b8" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 60 300 Q 200 220 350 200 Q 480 185 580 160 Q 680 140 740 100" stroke="#cbd5e0" stroke-width="3" fill="none" stroke-dasharray="12 8"/>
+    <path d="M 60 300 Q 160 255 270 225 Q 340 210 400 200" stroke="#497b89" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <circle cx="60" cy="300" r="10" fill="#15803d" filter="url(#sh)"/><circle cx="60" cy="300" r="6" fill="#fff"/>
+    <text x="60" y="325" text-anchor="middle" font-size="11" fill="#15803d" font-weight="700">Sétif</text>
+    <text x="60" y="338" text-anchor="middle" font-size="9.5" fill="#64748b">Entrepôt DigitalStore</text>
+    <circle cx="740" cy="100" r="10" fill="#497b89" filter="url(#sh)"/><circle cx="740" cy="100" r="6" fill="#fff"/>
+    <text x="740" y="125" text-anchor="middle" font-size="11" fill="#497b89" font-weight="700">Alger</text>
+    <text x="740" y="138" text-anchor="middle" font-size="9.5" fill="#64748b">Destination</text>
+    <g id="truckM" transform="translate(395,196)">
+      <circle r="20" fill="#497b89" filter="url(#sh)"/>
+      <circle r="20" fill="#497b89" opacity="0.3"><animate attributeName="r" values="20;32;20" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0;0.3" dur="2s" repeatCount="indefinite"/></circle>
+      <text y="6" text-anchor="middle" font-size="16">🚚</text>
+    </g>
+    <circle cx="200" cy="235" r="6" fill="#f59e0b"/><text x="200" y="225" text-anchor="middle" font-size="9" fill="#92400e" font-weight="600">Constantine</text>
+    <circle cx="580" cy="160" r="6" fill="#f59e0b"/><text x="580" y="150" text-anchor="middle" font-size="9" fill="#92400e" font-weight="600">Blida</text>
+    <g transform="translate(750,330)"><circle r="18" fill="white" stroke="#b2e0d0" stroke-width="1.5"/><text y="-6" text-anchor="middle" font-size="10" fill="#497b89" font-weight="700">N</text><text y="12" text-anchor="middle" font-size="10" fill="#64748b">S</text><line x1="0" y1="-12" x2="0" y2="12" stroke="#497b89" stroke-width="1.5"/></g>
+  </svg>`;
+  const truck = mapEl.querySelector('#truckM');
+  if (!truck) return;
+  const path=[[395,196],[430,193],[465,185],[510,175],[555,164]];
+  let step=0;
+  setInterval(()=>{ step=(step+1)%path.length; truck.setAttribute('transform',`translate(${path[step][0]},${path[step][1]})`); },3000);
+}
+
+// ══ TIMER ══
+function startTimer() {
+  const end = new Date();
+  end.setHours(end.getHours()+7,end.getMinutes()+24,end.getSeconds()+16);
+  setInterval(()=>{
+    let diff = Math.max(0,Math.floor((end-new Date())/1000));
+    const h=Math.floor(diff/3600); diff%=3600;
+    const m=Math.floor(diff/60); const s=diff%60;
+    document.getElementById('th').textContent=String(h).padStart(2,'0');
+    document.getElementById('tm').textContent=String(m).padStart(2,'0');
+    document.getElementById('ts').textContent=String(s).padStart(2,'0');
+  },1000);
+}
+
+// ══ MODAL ══
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ══ TOAST ══
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ══ INIT ══
+renderProducts();
+startTimer();
