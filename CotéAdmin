@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Store - Admin Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1abc9c;
+            --secondary-color: #16a085;
+            --bg-gradient: linear-gradient(135deg, #1abc9c 0%, #3498db 100%);
+            --dark-bg: #2c3e50;
+            --light-grey: #f4f7f6;
+            --white: #ffffff;
+            --danger: #e74c3c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--light-grey); height: 100vh; display: flex; overflow: hidden; }
+
+        /* --- SIDEBAR --- */
+        .sidebar { width: 260px; background-color: var(--dark-bg); color: var(--white); display: flex; flex-direction: column; transition: all 0.3s; }
+        .sidebar-header { padding: 30px 20px; text-align: center; background: rgba(0,0,0,0.1); }
+        .admin-logo { width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--primary-color); margin-bottom: 10px; object-fit: cover; }
+        .sidebar-menu { flex: 1; margin-top: 20px; }
+        .menu-item { padding: 15px 25px; display: flex; align-items: center; cursor: pointer; transition: 0.3s; color: #bdc3c7; }
+        .menu-item:hover, .menu-item.active { background-color: var(--primary-color); color: white; }
+        .menu-item i { margin-right: 15px; width: 20px; }
+
+        /* --- Déconnexion en rouge --- */
+        .logout {
+            margin-top: auto; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            color: var(--danger); 
+        }
+        .logout:hover {
+            background-color: var(--danger); 
+            color: white;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        header { background-color: var(--white); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .section-container { padding: 30px; }
+        .data-table-container { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        /* --- TABLES & BUTTONS --- */
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-add { background: var(--bg-gradient); color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--light-grey); color: #7f8c8d; }
+        td { padding: 12px; border-bottom: 1px solid var(--light-grey); }
+        .prod-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #eee; }
+        .actions i { margin-right: 15px; cursor: pointer; font-size: 18px; }
+        .fa-edit { color: #3498db; }
+        .fa-trash { color: var(--danger); }
+
+        /* --- MODAL STYLE --- */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; width: 500px; margin: 10% auto; padding: 30px; border-radius: 15px; position: relative; }
+        .modal-content h3 { margin-bottom: 20px; color: var(--dark-bg); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; }
+        .btn-save { background: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+    <img src="Logo.png" alt="Logo" class="admin-logo">
+    <h4>Digital Store</h4>
+
+    <div class="admin-status">
+        <i class="fas fa-user-shield"></i>
+        <span>Admin Connecté</span>
+    </div>
+</div>
+        <div class="sidebar-menu">
+            <div class="menu-item active" onclick="showSection('dashboard', this)"><i class="fas fa-chart-line"></i> Statistiques</div>
+            <div class="menu-item" onclick="showSection('products', this)"><i class="fas fa-laptop"></i> Stock Produits</div>
+            <div class="menu-item" onclick="showSection('orders', this)"><i class="fas fa-shopping-cart"></i> Commandes</div>
+        </div>
+        <div class="menu-item logout" onclick="location.reload()"><i class="fas fa-sign-out-alt"></i> Déconnexion</div>
+    </nav>
+
+    <main class="main-content">
+       
+        <header>
+            <h2 style="color: #16a085;" id="page-title">Tableau de Bord</h2>
+             <i class="fas fa-user-shield" style="color:#1abc9c;"></i> Admin Connecté
+        </header>
+
+        <div id="section-dashboard" class="section-container">
+            <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                <div class="data-table-container" style="flex: 1; text-align: center;">
+                    <h3 id="stat-total-price">0 DA</h3><p>Valeur Stock</p>
+                </div>
+                <div class="data-table-container" style="flex: 1; text-align: center;">
+                    <h3 id="stat-total-qty">0</h3><p>Articles Total</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="section-products" class="section-container" style="display:none;">
+            <div class="data-table-container">
+                <div class="table-header">
+                    <h3>Catalogue Materiels</h3>
+                    <button class="btn-add" onclick="openModal()">+ Ajouter un produit</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Nom</th>
+                            <th>Catégorie</th>
+                            <th>Prix</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="product-list">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="section-orders" class="section-container" style="display:none;">
+            <div class="data-table-container">
+                <h3>Suivi des Commandes</h3>
+                <table style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Client</th>
+                            <th>Total</th>
+                            <th>Statut</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>#1024</td><td>Jean Dupont</td><td>1299 DA</td><td><span style="color:green">Livré</span></td></tr>
+                        <tr><td>#1025</td><td>Sonia B.</td><td>850 DA</td><td><span style="color:orange">En cours</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">Ajouter un produit</h3>
+            <input type="hidden" id="editIndex">
+            <div class="form-group">
+                <label>Lien Photo (URL)</label>
+                <input type="text" id="pImg" placeholder="https://image-de-mon-produit.jpg">
+            </div>
+            <div class="form-group">
+                <label>Nom du produit</label>
+                <input type="text" id="pName">
+            </div>
+            <div class="form-group">
+                <label>Catégorie</label>
+                <select id="pCat">
+                    <option>PC Portable</option>
+                    <option>Composants</option>
+                    <option>Périphériques</option>
+                    <option>Écrans</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex:1">
+                    <label>Prix (DA)</label>
+                    <input type="number" id="pPrice">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>Stock</label>
+                    <input type="number" id="pStock">
+                </div>
+            </div>
+            <button class="btn-save" onclick="saveProduct()">Enregistrer</button>
+            <button onclick="closeModal()" style="background:none; border:none; color:gray; cursor:pointer; width:100%; margin-top:10px;">Annuler</button>
+        </div>
+    </div>
+
+    <script>
+        // --- BASE DE DONNÉES AVEC LOCALSTORAGE ---
+        let articles = JSON.parse(localStorage.getItem('articles')) || [];
+
+        // --- NAVIGATION ENTRE SECTIONS ---
+        function showSection(id, element) {
+            document.querySelectorAll('.section-container').forEach(s => s.style.display = 'none');
+            document.getElementById('section-' + id).style.display = 'block';
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            element.classList.add('active');
+            if(id === 'products') renderProducts();
+            if(id === 'dashboard') updateStats();
+        }
+
+        // --- AFFICHER LES PRODUITS ---
+        function renderProducts() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = "";
+            articles.forEach((item, index) => {
+                list.innerHTML += `
+                    <tr>
+                        <td><img src="${item.img}" class="prod-img" onerror="this.src='https://via.placeholder.com/50'"></td>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.cat}</td>
+                        <td>${item.price} DA</td>
+                        <td>${item.stock}</td>
+                        <td class="actions">
+                            <i class="fas fa-edit" onclick="editProduct(${index})"></i>
+                            <i class="fas fa-trash" onclick="deleteProduct(${index})"></i>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- MODAL LOGIQUE ---
+        function openModal() {
+            document.getElementById('productModal').style.display = 'block';
+            resetForm();
+        }
+
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        function resetForm() {
+            document.getElementById('editIndex').value = "-1";
+            document.getElementById('modalTitle').innerText = "Ajouter un produit";
+            document.getElementById('pName').value = "";
+            document.getElementById('pPrice').value = "";
+            document.getElementById('pStock').value = "";
+            document.getElementById('pImg').value = "";
+        }
+
+        // --- SAUVEGARDER (AJOUT / MODIF) ---
+        function saveProduct() {
+            const idx = document.getElementById('editIndex').value;
+            const newArticle = {
+                name: document.getElementById('pName').value,
+                cat: document.getElementById('pCat').value,
+                price: document.getElementById('pPrice').value,
+                stock: document.getElementById('pStock').value,
+                img: document.getElementById('pImg').value
+            };
+
+            if(idx === "-1") {
+                articles.push(newArticle);
+            } else {
+                articles[idx] = newArticle;
+            }
+
+            localStorage.setItem('articles', JSON.stringify(articles));
+
+            closeModal();
+            renderProducts();
+            updateStats();
+        }
+
+        // --- SUPPRIMER ---
+        function deleteProduct(index) {
+            if(confirm("Voulez-vous vraiment supprimer cet article ?")) {
+                articles.splice(index, 1);
+                localStorage.setItem('articles', JSON.stringify(articles));
+                renderProducts();
+                updateStats();
+            }
+        }
+
+        // --- MODIFIER ---
+        function editProduct(index) {
+            const item = articles[index];
+            document.getElementById('modalTitle').innerText = "Modifier l'article";
+            document.getElementById('editIndex').value = index;
+            document.getElementById('pName').value = item.name;
+            document.getElementById('pCat').value = item.cat;
+            document.getElementById('pPrice').value = item.price;
+            document.getElementById('pStock').value = item.stock;
+            document.getElementById('pImg').value = item.img;
+            document.getElementById('productModal').style.display = 'block';
+        }
+
+        // --- CALCULER LES STATS ---
+        function updateStats() {
+            let totalVal = 0;
+            let totalQty = 0;
+            articles.forEach(a => {
+                totalVal += (a.price * a.stock);
+                totalQty += parseInt(a.stock);
+            });
+            document.getElementById('stat-total-price').innerText = totalVal.toLocaleString() + " DA";
+            document.getElementById('stat-total-qty').innerText = totalQty;
+        }
+
+        window.onload = updateStats;
+    </script>
+</body>
+</html>
