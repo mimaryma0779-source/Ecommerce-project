@@ -1,0 +1,307 @@
+<DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Store - Accueil & Connexion</title>
+    <style>
+        /* ===== Reset & Base ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #e0faf2 0%, #b2f0e0 50%, #a7ffeb 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #111110;
+        }
+
+        /* ===== Animations ===== */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Background Elements (Les Boules qui bougent) ===== */
+        .bg-animated { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+        .bg-circle { position: absolute; border-radius: 50%; filter: blur(60px); animation: pulse 6s ease-in-out infinite; }
+        .bg-circle-1 { top: 5%; left: 5%; width: 300px; height: 300px; background: rgba(73, 123, 137, 0.15); animation: pulse 5s infinite; }
+        .bg-circle-2 { bottom: 10%; right: 5%; width: 400px; height: 400px; background: rgba(34, 197, 94, 0.15); animation: pulse 7s infinite reverse; }
+        .bg-circle-3 { top: 40%; left: 45%; width: 250px; height: 250px; background: rgba(73, 123, 137, 0.08); animation: pulse 8s infinite 1s; }
+
+        /* ===== Utility ===== */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .highlight { color: #3a6475; }
+
+        /* ===== Main Container ===== */
+        .container { position: relative; z-index: 10; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+        /* ===== Header & Logo ===== */
+        .logo-section { animation: fadeIn 0.8s ease-out; margin-bottom: 50px; }
+        .logo-wrapper { display: inline-block; position: relative; margin-bottom: 20px; animation: float 4s ease-in-out infinite; }
+        .logo-img { width: 160px; height: 160px; border-radius: 50%; border: 4px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative; z-index: 2; }
+        .logo-glow { position: absolute; inset: -10px; background: linear-gradient(135deg, #497b89, #22c55e); border-radius: 50%; filter: blur(30px); opacity: 0.4; }
+        
+        .main-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; }
+        .subtitle { font-size: 1.4rem; color: #497b89; font-weight: 600; margin-bottom: 10px; }
+        .description { color: #7a7a76; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+        /* ===== Features (Pourquoi choisir) ===== */
+        .why-section { margin: 60px 0; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
+        .feature-card { 
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); 
+            padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: 0.3s; animation: float 5s ease-in-out infinite;
+        }
+        .feature-card:nth-child(2) { animation-delay: 0.5s; }
+        .feature-card:nth-child(3) { animation-delay: 1s; }
+        .feature-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .feature-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+
+        /* ===== Option Cards (Les 3 choix) ===== */
+        .options-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; margin: 50px 0; }
+        .option-card { 
+            flex: 1 1 300px; max-width: 380px; background: rgba(255, 255, 255, 0.9); 
+            padding: 35px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent; text-align: left;
+        }
+        .option-card:hover { transform: scale(1.05); border-color: #22c55e; }
+        .option-card.primary { background: linear-gradient(135deg, #497b89, #22c55e); color: white; }
+        
+        .option-icon-box { 
+            width: 60px; height: 60px; background: linear-gradient(135deg, #497b89, #22c55e); 
+            border-radius: 15px; display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; margin-bottom: 20px; transition: 0.3s;
+        }
+        .option-card.primary .option-icon-box { background: rgba(255,255,255,0.2); }
+        .option-card:hover .option-icon-box { transform: rotate(10deg); }
+        
+        .option-card h3 { font-size: 1.6rem; margin-bottom: 10px; }
+        .option-card p { margin-bottom: 20px; opacity: 0.9; line-height: 1.5; }
+        .option-link { font-weight: 700; display: flex; align-items: center; gap: 10px; color: #497b89; }
+        .option-card.primary .option-link { color: white; }
+
+        /* ===== Tutorial Section ===== */
+        .tutorial-section { background: white; padding: 50px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin-top: 50px; }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-top: 30px; }
+        .step { display: flex; gap: 15px; }
+        .step-num { 
+            width: 40px; height: 40px; background: linear-gradient(135deg, #497b89, #22c55e); 
+            color: white; border-radius: 50%; display: flex; align-items: center; 
+            justify-content: center; font-weight: 800; flex-shrink: 0;
+        }
+        .step h4 { margin-bottom: 8px; font-weight: 700; }
+        .step p { font-size: 0.9rem; color: #666; line-height: 1.5; }
+
+        /* ===== Tip Box (Astuce) ===== */
+        .tip-box { 
+            margin-top: 40px; padding: 25px; border-radius: 20px; 
+            background: linear-gradient(90deg, rgba(73, 123, 137, 0.05), rgba(34, 197, 94, 0.1));
+            border-left: 5px solid #22c55e; display: flex; gap: 20px; align-items: center;
+        }
+        .promo-code { font-weight: 800; color: #22c55e; background: white; padding: 2px 8px; border-radius: 5px; }
+
+        /* ===== Forms (Login / Register) ===== */
+        .form-view { max-width: 450px; margin: 40px auto; background: white; padding: 45px; border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.2); animation: fadeIn 0.5s; }
+        .back-btn { cursor: pointer; color: #497b89; font-weight: 700; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 8px; }
+        .back-btn:hover { color: #22c55e; }
+        
+        input { width: 100%; padding: 14px 20px; margin-bottom: 18px; border: 2px solid #f0f0f0; border-radius: 15px; outline: none; transition: 0.3s; font-size: 1rem; }
+        input:focus { border-color: #22c55e; background: #fafafa; }
+        .btn-submit { width: 100%; padding: 16px; border: none; border-radius: 15px; background: linear-gradient(135deg, #497b89, #22c55e); color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3); }
+
+        @media (max-width: 768px) {
+            .main-title { font-size: 2.5rem; }
+            .tutorial-section { padding: 30px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-animated">
+        <div class="bg-circle bg-circle-1"></div>
+        <div class="bg-circle bg-circle-2"></div>
+        <div class="bg-circle bg-circle-3"></div>
+    </div>
+
+    <div class="container">
+        
+        <div id="homePage">
+            <header class="logo-section text-center">
+                <div class="logo-wrapper">
+                    <div class="logo-glow"></div>
+                    <img src="images/logo.png" alt="Digital Store Logo" class="logo-img">
+                </div>
+                <h1 class="main-title">Digital<span class="highlight">Store</span></h1>
+                <p class="subtitle">Matériel Informatique de Qualité</p>
+                <p class="description">
+                    Votre destination pour les meilleurs composants, périphériques et écrans au meilleur prix en Algérie. 
+                    Découvrez une large gamme de produits sélectionnés pour leur performance.
+                </p>
+            </header>
+
+            <section class="why-section">
+                <h2 class="text-center">Pourquoi choisir <span class="highlight">Digital Store</span> ?</h2>
+                <div class="features-grid">
+                    <div class="feature-card text-center">
+                        <span class="feature-icon">🎯</span>
+                        <h3 class="feature-title">Produits Authentiques</h3>
+                        <p style="color:#7a7a76; font-size:0.9rem;">100% de produits originaux avec garantie constructeur. Aucune contrefaçon.</p>
+                    </div>
+                    <div class="feature-card text-center">
+                        <span class="feature-icon">⚡</span>
+                        <h3 class="feature-title">Service Express</h3>
+                        <p style="color:#7a7a76; font-size:0.9rem;">Livraison rapide dans toute l'Algérie. Suivi en temps réel de votre commande.</p>
+                    </div>
+                    <div class="feature-card text-center">
+                        <span class="feature-icon">💎</span>
+                        <h3 class="feature-title">Meilleurs Prix</h3>
+                        <p style="color:#7a7a76; font-size:0.9rem;">Tarifs compétitifs avec des promotions régulières. Rapport qualité/prix imbattable.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="options-grid">
+                <div class="option-card" onclick="window.location.href='index5.html'"">
+                    <div class="option-icon-box">👁️</div>
+                    <h3>Visiteur</h3>
+                    <p>Explorez notre catalogue complet, comparez les prix et les spécifications sans créer de compte.</p>
+                    <div class="option-link">Continuer en tant que visiteur →</div>
+                </div>
+
+                <div class="option-card" onclick="showView('loginForm')">
+                    <div class="option-icon-box">🔐</div>
+                    <h3>Connexion</h3>
+                    <p>Accédez à votre compte personnel, suivez vos commandes en cours et gérez votre profil.</p>
+                    <div class="option-link">Se connecter →</div>
+                </div>
+
+                <div class="option-card primary" onclick="showView('registerForm')">
+                    <div class="option-icon-box">✨</div>
+                    <h3>Créer un compte</h3>
+                    <p>Inscrivez-vous pour profiter de tous les avantages, sauvegarder vos favoris et commander.</p>
+                    <div class="option-link">Commencer maintenant →</div>
+                </div>
+            </div>
+
+            <section class="tutorial-section">
+                <div class="text-center">
+                    <h2 style="font-size: 2rem;">Comment utiliser <span class="highlight">Digital Store</span> ?</h2>
+                    <p style="color:#7a7a76; margin-top:10px;">Guide rapide en 4 étapes simples</p>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div>
+                            <h4>Parcourir le catalogue</h4>
+                            <p>Explorez nos catégories : écrans, processeurs, GPU, périphériques et RAM. Utilisez les filtres.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div>
+                            <h4>Ajouter au panier</h4>
+                            <p>Cliquez sur un produit pour voir les détails et avis. Ajoutez-les en un clic.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div>
+                            <h4>Passer commande</h4>
+                            <p>Choisissez votre mode de paiement : CIB, Dahabia, CCP ou paiement à la livraison.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">4</div>
+                        <div>
+                            <h4>Suivre votre colis</h4>
+                            <p>Recevez un numéro de suivi. Suivez votre commande sur notre carte interactive.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip-box">
+                    <span style="font-size: 2rem;">💡</span>
+                    <div>
+                        <h4 style="margin-bottom:5px;">Astuce</h4>
+                        <p style="color:#666;">Créez un compte pour sauvegarder vos favoris et bénéficier d'offres exclusives. Utilisez le code <span class="promo-code">DIGITAL10</span> pour -10% sur votre première commande !</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="loginForm" class="form-view hidden">
+            <div class="back-btn" onclick="showView('homePage')">← Retour à l'accueil</div>
+            <h2 class="text-center">Se connecter</h2>
+            <p class="text-center" style="color:#7a7a76; margin: 10px 0 25px;">Accédez à votre espace sécurisé</p>
+            
+            <input type="email" id="lEmail" placeholder="exemple@email.com">
+            <input type="password" id="lPass" placeholder="Mot de passe">
+            
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; font-size:0.9rem;">
+                <input type="checkbox" style="width:auto; margin:0;"> Se souvenir de moi
+            </div>
+
+            <button class="btn-submit" onclick="loginAction()">Se connecter →</button>
+            <p class="text-center" style="margin-top:20px; font-size:0.95rem;">
+                Pas encore de compte ? <span onclick="showView('registerForm')" style="color:#497b89; cursor:pointer; font-weight:700;">Créer un compte</span>
+            </p>
+        </div>
+
+        <div id="registerForm" class="form-view hidden">
+            <div class="back-btn" onclick="showView('homePage')">← Retour à l'accueil</div>
+            <h2 class="text-center">Créer un compte</h2>
+            <p class="text-center" style="color:#7a7a76; margin: 10px 0 25px;">Inscrivez-vous en quelques secondes</p>
+            
+            <input type="text" id="rName" placeholder="Nom complet">
+            <input type="email" id="rEmail" placeholder="exemple@email.com">
+            <input type="password" id="rPass" placeholder="Mot de passe (Min. 8 caractères)">
+            <input type="tel" id="rPhone" placeholder="0550 123 456">
+            <input type="text" id="rAddress" placeholder="Rue, quartier, ville">
+            
+            <button class="btn-submit" onclick="registerAction()">Créer mon compte ✨</button>
+            <p class="text-center" style="margin-top:20px; font-size:0.95rem;">
+                Déjà un compte ? <span onclick="showView('loginForm')" style="color:#497b89; cursor:pointer; font-weight:700;">Se connecter</span>
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        // Gestion de l'affichage des sections
+        function showView(viewId) {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            
+            document.getElementById(viewId).classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Actions Login / Register
+        function loginAction() {
+            const email = document.getElementById('lEmail').value;
+            if(email) alert('Connexion réussie pour ' + email);
+            else alert('Veuillez remplir les champs');
+        }
+
+        function registerAction() {
+            const name = document.getElementById('rName').value;
+            if(name) alert('Félicitations ' + name + ', votre compte est prêt !');
+            else alert('Veuillez remplir tous les champs');
+        }
+    </script>
+</body>
+</html>
