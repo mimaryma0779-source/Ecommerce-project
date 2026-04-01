@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DigitalStore — Matériel Informatique</title>
+<link rel="stylesheet" href="style4.css">
+ <script src="script4.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+<!-- ══ AUTH MODAL ══ -->
+<div class="auth-overlay" id="authModal">
+  <div class="auth-modal">
+    <button class="auth-close" onclick="closeAuthModal()">✕</button>
+    <img src="Logo.png" alt="Logo DigitalStore" class="logo-img">
+    <span class="logo-text"><span class="digital">Digital</span><span class="store">Store</span></span>
+    <div style="text-align:center;margin-bottom:6px">
+      <div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--teal)">Digital<span style="color:#22c55e">Store</span></div>
+    </div>
+    <div class="auth-title" id="authTitle">Se Connecter</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="loginTab" onclick="switchAuthTab('login')">Connexion</button>
+      <button class="auth-tab" id="registerTab" onclick="switchAuthTab('register')">Créer un compte</button>
+    </div>
+    <div class="auth-form active" id="loginForm">
+      <input type="email" id="loginEmail" class="auth-input" placeholder=" Adresse email">
+      <input type="password" id="loginPass" class="auth-input" placeholder=" Mot de passe">
+      <button class="auth-submit" onclick="loginUser()">Se connecter →</button>
+      <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted)">Pas encore de compte ? <a onclick="switchAuthTab('register')" style="color:var(--teal);cursor:pointer;font-weight:600">Créer un compte</a></p>
+    </div>
+    <div class="auth-form" id="registerForm">
+      <input type="text" id="regName" class="auth-input" placeholder=" Nom complet">
+      <input type="email" id="regEmail" class="auth-input" placeholder=" Email">
+      <input type="password" id="regPass" class="auth-input" placeholder=" Mot de passe (min 8 caractères)">
+      <input type="tel" id="regPhone" class="auth-input" placeholder="Téléphone (ex: 0550 123 456)">
+      <input type="text" id="regAddress" class="auth-input" placeholder=" Adresse de livraison">
+      <button class="auth-submit" onclick="registerUser()">Créer mon compte </button>
+      <p style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted)">Déjà un compte ? <a onclick="switchAuthTab('login')" style="color:var(--teal);cursor:pointer;font-weight:600">Se connecter</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PAYMENT MODAL ══ -->
+<div class="pay-overlay" id="payModal">
+  <div class="pay-modal">
+    <div class="pay-header">
+      <div class="pay-header-title">💳 Paiement sécurisé</div>
+      <button class="pay-close" onclick="closePayModal()">✕</button>
+    </div>
+    <div class="pay-body">
+      <!-- Secure badge -->
+      <div class="pay-secure">
+         Connexion SSL 256 bits — Vos données sont protégées
+      </div>
+
+      <!-- Order recap -->
+      <div class="pay-recap">
+        <div class="pay-recap-title">Récapitulatif de commande</div>
+        <div id="payRecapItems"></div>
+        <div class="pay-recap-total">
+          <span class="pay-recap-total-label">Total TTC</span>
+          <span class="pay-recap-total-amount" id="payTotalDisplay">0 DA</span>
+        </div>
+      </div>
+
+      <!-- Delivery info -->
+      <div class="delivery-section">
+        <div class="delivery-title">📦 Adresse de livraison</div>
+        <div class="pay-row">
+          <div class="pay-field">
+            <label class="pay-label">Prénom</label>
+            <input class="pay-input" type="text" id="del-firstname" placeholder="Ahmed">
+          </div>
+          <div class="pay-field">
+            <label class="pay-label">Nom</label>
+            <input class="pay-input" type="text" id="del-lastname" placeholder="Benali">
+          </div>
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Téléphone</label>
+          <input class="pay-input" type="tel" id="del-phone" placeholder="0550 123 456">
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Adresse complète</label>
+          <input class="pay-input" type="text" id="del-address" placeholder="Rue, numéro, quartier">
+        </div>
+        <div class="pay-row">
+          <div class="pay-field">
+            <label class="pay-label">Wilaya</label>
+            <select class="pay-input" id="del-wilaya">
+              <option value="">Sélectionner...</option>
+              <option>Adrar</option><option>Chlef</option><option>Laghouat</option><option>Oum el Bouaghi</option>
+              <option>Batna</option><option>Béjaïa</option><option>Biskra</option><option>Béchar</option>
+              <option>Blida</option><option>Bouira</option><option>Tamanrasset</option><option>Tébessa</option>
+              <option>Tlemcen</option><option>Tiaret</option><option>Tizi Ouzou</option><option>Alger</option>
+              <option>Djelfa</option><option>Jijel</option><option selected>Sétif</option><option>Saïda</option>
+              <option>Skikda</option><option>Sidi Bel Abbès</option><option>Annaba</option><option>Guelma</option>
+              <option>Constantine</option><option>Médéa</option><option>Mostaganem</option><option>M'Sila</option>
+              <option>Mascara</option><option>Ouargla</option><option>Oran</option><option>El Bayadh</option>
+              <option>Illizi</option><option>Bordj Bou Arréridj</option><option>Boumerdès</option><option>El Tarf</option>
+              <option>Tindouf</option><option>Tissemsilt</option><option>El Oued</option><option>Khenchela</option>
+              <option>Souk Ahras</option><option>Tipaza</option><option>Mila</option><option>Aïn Defla</option>
+              <option>Naâma</option><option>Aïn Témouchent</option><option>Ghardaïa</option><option>Relizane</option>
+              <option>Timimoun</option><option>Bordj Badji Mokhtar</option><option>Ouled Djellal</option>
+              <option>Beni Abbès</option><option>In Salah</option><option>In Guezzam</option><option>Touggourt</option>
+              <option>Djanet</option><option>El M'Ghair</option><option>El Meniaa</option>
+            </select>
+          </div>
+          <div class="pay-field">
+            <label class="pay-label">Code postal</label>
+            <input class="pay-input" type="text" id="del-postal" placeholder="19000">
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment methods -->
+      <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;">Méthode de paiement</div>
+      <div class="pay-methods">
+        <button class="pay-method-btn active" onclick="switchPayMethod('cib')">
+          <span class="pay-method-icon">💳</span>CIB / Carte
+        </button>
+        <button class="pay-method-btn" onclick="switchPayMethod('dahabia')">
+          <span class="pay-method-icon">🟡</span>Dahabia
+        </button>
+        <button class="pay-method-btn" onclick="switchPayMethod('ccp')">
+          <span class="pay-method-icon">🟠</span>CCP / Baridimob
+        </button>
+        <button class="pay-method-btn" onclick="switchPayMethod('cod')">
+          <span class="pay-method-icon">💵</span>À la livraison
+        </button>
+      </div>
+
+      <!-- CIB / CARD panel -->
+      <div class="pay-panel active" id="panel-cib">
+        <div class="card-visual">
+          <div class="card-chip"></div>
+          <div class="card-number" id="cardNumDisplay">•••• •••• •••• ••••</div>
+          <div class="card-bottom">
+            <div>
+              <div class="card-label">Titulaire</div>
+              <div class="card-value" id="cardNameDisplay">VOTRE NOM</div>
+            </div>
+            <div>
+              <div class="card-label">Expiration</div>
+              <div class="card-value" id="cardExpDisplay">MM/AA</div>
+            </div>
+            <svg width="48" height="30" viewBox="0 0 48 30" style="opacity:.8">
+              <circle cx="18" cy="15" r="12" fill="#eb001b" opacity="0.85"/>
+              <circle cx="30" cy="15" r="12" fill="#f79e1b" opacity="0.85"/>
+              <path d="M24 6.5 C26.8 9 28.5 11.8 28.5 15 C28.5 18.2 26.8 21 24 23.5 C21.2 21 19.5 18.2 19.5 15 C19.5 11.8 21.2 9 24 6.5Z" fill="#ff5f00"/>
+            </svg>
+          </div>
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Numéro de carte</label>
+          <input class="pay-input" type="text" id="card-num" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Nom du titulaire</label>
+          <input class="pay-input" type="text" id="card-name" placeholder="AHMED BENALI" oninput="document.getElementById('cardNameDisplay').textContent=this.value.toUpperCase()||'VOTRE NOM'">
+        </div>
+        <div class="pay-row">
+          <div class="pay-field">
+            <label class="pay-label">Date d'expiration</label>
+            <input class="pay-input" type="text" id="card-exp" placeholder="MM/AA" maxlength="5" oninput="formatExp(this)">
+          </div>
+          <div class="pay-field">
+            <label class="pay-label">CVV</label>
+            <input class="pay-input" type="text" id="card-cvv" placeholder="•••" maxlength="3">
+          </div>
+        </div>
+      </div>
+
+      <!-- Dahabia panel -->
+      <div class="pay-panel" id="panel-dahabia">
+        <div class="dahabia-info">
+          <div class="dahabia-title">💳 Paiement par carte Dahabia (CPA / BNA)</div>
+          <div style="font-size:13px;color:#1e3a8a;line-height:1.7">
+            Entrez les informations de votre carte Dahabia. Le paiement sera traité via le réseau Satim sécurisé.
+          </div>
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Numéro de carte Dahabia</label>
+          <input class="pay-input" type="text" id="dah-num" placeholder="4000 0000 0000 0000" maxlength="19" oninput="formatCard(this)">
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Nom du titulaire</label>
+          <input class="pay-input" type="text" id="dah-name" placeholder="AHMED BENALI">
+        </div>
+        <div class="pay-row">
+          <div class="pay-field">
+            <label class="pay-label">Date d'expiration</label>
+            <input class="pay-input" type="text" id="dah-exp" placeholder="MM/AA" maxlength="5" oninput="formatExp(this)">
+          </div>
+          <div class="pay-field">
+            <label class="pay-label">CVV</label>
+            <input class="pay-input" type="text" id="dah-cvv" placeholder="•••" maxlength="3">
+          </div>
+        </div>
+        <div style="background:var(--blue-light);border-radius:var(--rs);padding:12px 14px;font-size:12.5px;color:#1e3a8a;margin-top:4px;">
+           Votre paiement est sécurisé par le réseau <strong>SATIM</strong> — infrastructure nationale de paiement électronique.
+        </div>
+      </div>
+
+      <!-- CCP panel -->
+      <div class="pay-panel" id="panel-ccp">
+        <div class="ccp-info">
+          <div class="ccp-title"> Virement CCP / Baridimob</div>
+          <div class="ccp-step">
+            <div class="ccp-step-num">1</div>
+            <div>Notez votre numéro de commande une fois confirmé</div>
+          </div>
+          <div class="ccp-step">
+            <div class="ccp-step-num">2</div>
+            <div>Effectuez un virement vers notre compte CCP</div>
+          </div>
+          <div class="ccp-account">18 004 0001234 56 — Clé 78<br><span style="font-size:12px;font-weight:400;color:var(--muted)">DigitalStore SARL — Sétif</span></div>
+          <div class="ccp-step">
+            <div class="ccp-step-num">3</div>
+            <div>Envoyez la preuve de paiement par WhatsApp ou email</div>
+          </div>
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Votre numéro CCP (pour remboursement éventuel)</label>
+          <input class="pay-input" type="text" id="ccp-num" placeholder="Ex: 12 345 6789 00 — Clé 12">
+        </div>
+        <div class="pay-field">
+          <label class="pay-label">Numéro Baridimob (optionnel)</label>
+          <input class="pay-input" type="tel" id="ccp-mobile" placeholder="Ex: 0699 000 000">
+        </div>
+        <div style="background:var(--orange-light);border-radius:var(--rs);padding:12px 14px;font-size:12.5px;color:var(--orange);">
+          ⏱️ La commande sera validée dans les <strong>24h</strong> après réception du virement.
+        </div>
+      </div>
+
+      <!-- Cash on delivery panel -->
+      <div class="pay-panel" id="panel-cod">
+        <div style="background:var(--green-light);border:1px solid rgba(21,128,61,.2);border-radius:var(--r);padding:24px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:12px;">💵</div>
+          <div style="font-weight:700;font-size:16px;color:var(--green);margin-bottom:8px;">Paiement à la livraison</div>
+          <div style="font-size:13.5px;color:var(--muted);line-height:1.6;">
+            Payez en espèces directement au livreur. Aucune information bancaire requise.<br><br>
+            ⚠️ Préparez l'appoint exact — les livreurs ne rendent pas toujours la monnaie.
+          </div>
+        </div>
+        <div style="margin-top:16px;background:var(--bg);border-radius:var(--rs);padding:14px;">
+          <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;">Conditions</div>
+          <div style="font-size:13px;color:var(--muted);">✓ Disponible dans toute l'Algérie</div>
+          <div style="font-size:13px;color:var(--muted);">✓ Livraison sous 48 à 72h</div>
+          <div style="font-size:13px;color:var(--red);">✕ Non disponible pour les commandes &gt; 200 000 DA</div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button class="pay-submit-btn" id="paySubmitBtn" onclick="processPayment()">
+        🔒 Confirmer et payer — <span id="payBtnAmount">0 DA</span>
+      </button>
+      <div class="pay-logos">
+        <span class="pay-logo-badge">CIB</span>
+        <span class="pay-logo-badge">DAHABIA</span>
+        <span class="pay-logo-badge">CCP</span>
+        <span class="pay-logo-badge">SATIM</span>
+        <span class="pay-logo-badge">SSL 256</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <div class="logo" onclick="nav('home')">
+    <img src="images/logo.png" alt="Logo DigitalkStore" class="logo-img">
+    <div class="logo-text"><span class="digital">Digital</span><span class="store">Store</span></div>
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="nav('home');setActive(this)">Accueil</button>
+    <button class="nav-link" onclick="nav('catalog');setActive(this)">Catalogue</button>
+    <button class="nav-link tutorial-btn" onclick="startTutorial()">✨ Tutoriel</button>
+    <button class="nav-link" onclick="nav('wishlist');setActive(this)">Wishlist</button>
+    <button class="nav-link" onclick="nav('compare');setActive(this)">Comparateur</button>
+    <button class="nav-link" onclick="nav('track');setActive(this)">Suivi commande</button>
+  </div>
+  <div class="nav-right">
+    <button class="nav-icon-btn" onclick="nav('wishlist');setActive(null)" title="Wishlist">
+      ♡<span class="nav-badge" id="wishCount" style="display:none">0</span>
+    </button>
+    <button class="connect-btn" id="connectBtn" onclick="openAuthModal()">
+      <span id="connectIcon">👤</span>
+      <span id="connectText">Connexion</span>
+    </button>
+    <button class="cart-btn" onclick="nav('cart');setActive(null)">
+      🛒 Panier <span class="nav-badge" id="cartCount">0</span>
+    </button>
+    <button class="hamburger" id="hamburger" onclick="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile nav -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="nav-link" onclick="nav('home');closeMobileNav()"> Accueil</button>
+  <button class="nav-link" onclick="nav('catalog');closeMobileNav()"> Catalogue</button>
+  <button class="nav-link" onclick="nav('wishlist');closeMobileNav()"> Wishlist</button>
+  <button class="nav-link" onclick="nav('compare');closeMobileNav()"> Comparateur</button>
+  <button class="nav-link" onclick="nav('track');closeMobileNav()"> Suivi commande</button>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast"></div>
+
+<!-- ══ COMPARE BAR ══ -->
+<div id="compareBar">
+  <div class="cb-slots" id="cbSlots"></div>
+  <button class="cb-clear" onclick="clearCompare()">Vider</button>
+  <button class="cb-compare-btn" onclick="nav('compare');setActive(null)">⚖️ Comparer maintenant</button>
+</div>
+
+<!-- ══════════ HOME ══════════ -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div>
+      <div class="hero-eyebrow">Nouvelle collection 2026</div>
+      <h1>Le matériel<br>qui <em>performe</em><br>vraiment.</h1>
+      <p class="hero-sub">Composants, périphériques et accessoires haut de gamme, sélectionnés pour les pros et les passionnés.</p>
+      <div class="hero-ctas">
+        <button class="btn btn-dark" onclick="nav('catalog');setActive(document.querySelectorAll('.nav-link')[1])">Explorer le catalogue →</button>
+        <button class="btn btn-outline" onclick="nav('track');setActive(null)">📦 Suivre ma commande</button>
+      </div>
+    </div>
+    <div class="hero-panel">
+      <div class="panel-label">Tendances du moment</div>
+      <div class="mini-product" onclick="showDetail(0)">
+        <div class="mini-icon"><img src="ASUS ProArt Display 4K.jpg" alt="Écran"></div>
+        <div class="mini-info"><div class="mini-name">ASUS ProArt 4K 32"</div><div class="mini-price">749 900 DA</div></div>
+        <div class="mini-tag tag-new">NOUVEAU</div>
+      </div>
+      <div class="mini-product" onclick="showDetail(2)">
+        <div class="mini-icon"><img src="Keychron Q3 Pro.jpg" alt="Clavier"></div>
+        <div class="mini-info"><div class="mini-name">Keychron Q3 Pro</div><div class="mini-price">184 900 DA</div></div>
+        <div class="mini-tag tag-stock">EN STOCK</div>
+      </div>
+      <div class="mini-product" onclick="showDetail(4)">
+        <div class="mini-icon"><img src="GeForce RTX 4070 Super (1).jpg" alt="GPU"></div>
+        <div class="mini-info"><div class="mini-name">RTX 4070 Super</div><div class="mini-price">629 900 DA</div></div>
+        <div class="mini-tag tag-promo">PROMO</div>
+      </div>
+      <div class="mini-product" onclick="showDetail(5)">
+        <div class="mini-icon"><img src="AMD Ryzen 9 7950X (1).jpg" alt="CPU"></div>
+        <div class="mini-info"><div class="mini-name">AMD Ryzen 9 7950X</div><div class="mini-price">549 900 DA</div></div>
+        <div class="mini-tag tag-stock">TOP VENTE</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat"><div class="stat-num">2 400+</div><div class="stat-lbl">Produits en stock</div></div>
+    <div class="stat"><div class="stat-num">48h</div><div class="stat-lbl">Livraison express</div></div>
+    <div class="stat"><div class="stat-num">4.9★</div><div class="stat-lbl">Satisfaction client</div></div>
+    <div class="stat"><div class="stat-num">24/7</div><div class="stat-lbl">Support client</div></div>
+  </div>
+
+  <div class="deals-banner" style="margin-top:48px">
+    <div class="deals-text">
+      <div class="deals-eyebrow">🔥 Offre flash limitée</div>
+      <div class="deals-title">jusqu'à −30% sur les GPU</div>
+      <div class="deals-sub">RTX 4070 Super, RX 7900 XTX et bien plus — stock limité !</div>
+      <button class="btn btn-outline" style="margin-top:20px;color:#fff;border-color:rgba(255,255,255,.3)" onclick="filterCat('GPU');nav('catalog')">Voir les offres →</button>
+    </div>
+    <div class="deals-timer">
+      <div class="timer-block"><div class="timer-num" id="th">00</div><div class="timer-lbl">Heures</div></div>
+      <div class="timer-sep">:</div>
+      <div class="timer-block"><div class="timer-num" id="tm">00</div><div class="timer-lbl">Min</div></div>
+      <div class="timer-sep">:</div>
+      <div class="timer-block"><div class="timer-num" id="ts">00</div><div class="timer-lbl">Sec</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head">
+      <h2>Catégories</h2>
+      <a class="link-more" onclick="nav('catalog');setActive(document.querySelectorAll('.nav-link')[1])">Tout voir →</a>
+    </div>
+    <div class="cats-grid">
+      <div class="cat-card" onclick="filterCat('Écrans');nav('catalog')"><div class="cat-icon">🖥️</div><div class="cat-name">Écrans</div><div class="cat-count">24 produits</div></div>
+      <div class="cat-card" onclick="filterCat('Processeurs');nav('catalog')"><div class="cat-icon">🔲</div><div class="cat-name">Processeurs</div><div class="cat-count">38 produits</div></div>
+      <div class="cat-card" onclick="filterCat('Périphériques');nav('catalog')"><div class="cat-icon">⌨️</div><div class="cat-name">Périphériques</div><div class="cat-count">56 produits</div></div>
+      <div class="cat-card" onclick="filterCat('GPU');nav('catalog')"><div class="cat-icon">🎮</div><div class="cat-name">Cartes graphiques</div><div class="cat-count">19 produits</div></div>
+      <div class="cat-card" onclick="filterCat('Stockage');nav('catalog')"><div class="cat-icon">💾</div><div class="cat-name">Stockage</div><div class="cat-count">41 produits</div></div>
+      <div class="cat-card" onclick="filterCat('RAM');nav('catalog')"><div class="cat-icon">🧠</div><div class="cat-name">Mémoire RAM</div><div class="cat-count">29 produits</div></div>
+      <div class="cat-card" onclick="filterCat('Réseau');nav('catalog')"><div class="cat-icon">📡</div><div class="cat-name">Réseau</div><div class="cat-count">17 produits</div></div>
+      <div class="cat-card" onclick="filterCat('Boîtiers');nav('catalog')"><div class="cat-icon">📦</div><div class="cat-name">Boîtiers & Alim.</div><div class="cat-count">33 produits</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CATALOG ══════════ -->
+<div class="page" id="page-catalog">
+  <div class="catalog-wrap">
+    <aside class="sidebar">
+      <div class="sb-card">
+        <div class="sb-title">Catégorie</div>
+        <div class="filt-opt"><input type="radio" name="cat" id="c-all" checked onchange="filterCat('Tout')"><label for="c-all">Tout <span class="cnt">(224)</span></label></div>
+        <div class="filt-opt"><input type="radio" name="cat" id="c-ecr" onchange="filterCat('Écrans')"><label for="c-ecr">Écrans <span class="cnt">(24)</span></label></div>
+        <div class="filt-opt"><input type="radio" name="cat" id="c-cpu" onchange="filterCat('Processeurs')"><label for="c-cpu">Processeurs <span class="cnt">(38)</span></label></div>
+        <div class="filt-opt"><input type="radio" name="cat" id="c-per" onchange="filterCat('Périphériques')"><label for="c-per">Périphériques <span class="cnt">(56)</span></label></div>
+        <div class="filt-opt"><input type="radio" name="cat" id="c-gpu" onchange="filterCat('GPU')"><label for="c-gpu">Cartes graphiques <span class="cnt">(19)</span></label></div>
+        <div class="filt-opt"><input type="radio" name="cat" id="c-sto" onchange="filterCat('Stockage')"><label for="c-sto">Stockage <span class="cnt">(41)</span></label></div>
+        <div class="filt-opt"><input type="radio" name="cat" id="c-ram" onchange="filterCat('RAM')"><label for="c-ram">RAM <span class="cnt">(29)</span></label></div>
+      </div>
+      <div class="sb-card">
+        <div class="sb-title">Prix (DA)</div>
+        <div class="price-row">
+          <input class="price-in" type="number" id="minP" placeholder="Min" oninput="renderProducts()">
+          <span>—</span>
+          <input class="price-in" type="number" id="maxP" placeholder="Max" oninput="renderProducts()">
+        </div>
+      </div>
+      <div class="sb-card">
+        <div class="sb-title">Disponibilité</div>
+        <div class="filt-opt"><input type="checkbox" id="inStock" onchange="renderProducts()"><label for="inStock">En stock uniquement</label></div>
+        <div class="filt-opt"><input type="checkbox" id="onSale" onchange="renderProducts()"><label for="onSale">En promotion</label></div>
+      </div>
+      <div class="sb-card">
+        <div class="sb-title">Note minimum</div>
+        <select class="price-in" id="minRating" onchange="renderProducts()" style="width:100%">
+          <option value="0">Toutes notes</option>
+          <option value="4">4★ et plus</option>
+          <option value="4.5">4.5★ et plus</option>
+        </select>
+      </div>
+    </aside>
+    <div class="catalog-main">
+      <div class="search-wrap">
+        <input class="search-in" type="text" id="searchIn" placeholder="Rechercher un produit, une marque…" oninput="renderProducts()">
+        <button class="search-go">🔍</button>
+      </div>
+      <div class="catalog-bar">
+        <div class="result-count" id="resCnt"></div>
+        <div class="bar-right">
+          <div class="compare-hint" id="compareHint" style="display:none">
+            <span id="cmpCount">0</span> sélectionné(s)
+            <span class="compare-count-pill" onclick="nav('compare');setActive(null)">Comparer →</span>
+          </div>
+          <select class="sort-sel" id="sortSel" onchange="renderProducts()">
+            <option value="default">Trier par défaut</option>
+            <option value="price-asc">Prix croissant</option>
+            <option value="price-desc">Prix décroissant</option>
+            <option value="name">Nom A–Z</option>
+            <option value="rating">Mieux notés</option>
+          </select>
+        </div>
+      </div>
+      <div class="products-grid" id="prodGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DETAIL ══════════ -->
+<div class="page" id="page-detail">
+  <div class="detail-wrap">
+    <div class="breadcrumb">
+      <span onclick="nav('home')">Accueil</span><span class="bc-sep">›</span>
+      <span onclick="nav('catalog')">Catalogue</span><span class="bc-sep">›</span>
+      <span id="bc-cat">—</span><span class="bc-sep">›</span>
+      <span id="bc-name" style="color:var(--text);font-weight:500">—</span>
+    </div>
+    <div class="detail-grid">
+      <div>
+        <div class="detail-main-img" id="dImg">
+          <img id="dImgMain" src="" alt="">
+        </div>
+        <div class="detail-thumbs" id="dThumbs"></div>
+      </div>
+      <div>
+        <div class="detail-cat" id="dCat"></div>
+        <div class="detail-title" id="dTitle"></div>
+        <div class="rating-row">
+          <div class="stars-lg">★★★★★</div>
+          <div class="rating-text" id="dRatingText"></div>
+          <a class="see-reviews" onclick="scrollToReviews()">Voir les avis</a>
+        </div>
+        <div class="price-row">
+          <div class="price-big" id="dPrice"></div>
+          <div class="price-old" id="dOld"></div>
+          <div class="price-disc" id="dDisc" style="display:none"></div>
+        </div>
+        <div class="stock-badge in-stock">✓ En stock — Livraison sous 48h</div>
+        <div class="detail-desc" id="dDesc"></div>
+        <div class="specs-grid" id="dSpecs"></div>
+        <div class="qty-row">
+          <div class="qty-lbl">Quantité</div>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <div class="qty-val" id="dQty">1</div>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <button class="btn-cart-lg" id="dAddBtn">🛒 Ajouter au panier</button>
+          <button class="btn-wish-lg" id="dWishBtn" onclick="toggleWishDetail()">♡</button>
+        </div>
+        <div class="trust-row">
+          <div class="trust-item"><span class="trust-icon"></span> Livraison 48h</div>
+          <div class="trust-item"><span class="trust-icon"></span> Retour 30j</div>
+          <div class="trust-item"><span class="trust-icon"></span> Garantie 2 ans</div>
+          <div class="trust-item"><span class="trust-icon"></span> Paiement sécurisé</div>
+        </div>
+      </div>
+    </div>
+    <div class="reviews-section" id="reviewsSection">
+      <div class="reviews-header">
+        <h2>Avis clients</h2>
+        <button class="btn btn-outline" style="font-size:13px;padding:9px 18px" onclick="openReviewModal()">✍️ Laisser un avis</button>
+      </div>
+      <div style="display:flex;gap:32px;align-items:flex-start;margin-bottom:28px;flex-wrap:wrap">
+        <div class="review-avg">
+          <div class="avg-num" id="avgNum">4.8</div>
+          <div><div class="avg-stars">★★★★★</div><div class="avg-count" id="avgCount">142 avis</div></div>
+        </div>
+        <div class="rating-bars" id="ratingBars"></div>
+      </div>
+      <div class="review-cards" id="reviewCards"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ CART ══════════ -->
+<div class="page" id="page-cart">
+  <div class="cart-wrap">
+    <div>
+      <div class="cart-title">Mon panier 🛒</div>
+      <div id="cartItems"></div>
+    </div>
+    <div class="summary-box">
+      <div class="sum-title">Résumé commande</div>
+      <div class="sum-row"><span class="sum-lbl">Sous-total</span><span id="sumSub">0 DA</span></div>
+      <div class="sum-row"><span class="sum-lbl">Livraison</span><span style="color:var(--green);font-weight:600">Gratuite</span></div>
+      <div class="sum-row"><span class="sum-lbl">TVA (19%)</span><span id="sumTVA">0 DA</span></div>
+      <div class="promo-row">
+        <input class="promo-in" type="text" id="promoIn" placeholder="Code promo (DIGITAL10)">
+        <button class="promo-go" onclick="applyPromo()">Appliquer</button>
+      </div>
+      <div class="sum-row" id="discRow" style="display:none;color:var(--green)">
+        <span class="sum-lbl">Réduction</span><span id="discAmt">-0 DA</span>
+      </div>
+      <div class="sum-row total"><span>Total TTC</span><span class="sum-val" id="sumTotal">0 DA</span></div>
+      <button class="checkout-btn" onclick="openPayModal()"> Passer la commande</button>
+      <div class="pay-note">Paiement 100% sécurisé · CCP, CIB, Dahabia</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ WISHLIST ══════════ -->
+<div class="page" id="page-wishlist">
+  <div class="wishlist-page">
+    <div class="section-head">
+      <h2>Ma Wishlist ♡</h2>
+      <span class="link-more" id="wishSubtitle">0 produit</span>
+    </div>
+    <div class="wishlist-grid" id="wishGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════ COMPARATEUR ══════════ -->
+<div class="page" id="page-compare">
+  <div class="compare-title">⚖️ Comparateur de produits</div>
+  <div id="compareContent"></div>
+</div>
+
+<!-- ══════════ SUIVI COMMANDE ══════════ -->
+<div class="page" id="page-track">
+  <div class="track-title">📦 Suivi de commande</div>
+  <p class="track-sub">Entrez votre numéro de commande pour suivre votre livraison en temps réel.</p>
+  <div class="track-search">
+    <input class="track-in" type="text" id="trackIn" placeholder="Ex: DS-2026-8472" value="DS-2026-8472">
+    <button class="track-go" onclick="trackOrder()">Rechercher</button>
+  </div>
+  <div id="trackResult"></div>
+</div>
+
+<!-- ══ REVIEW MODAL ══ -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="closeModal('reviewModal')">✕</button>
+    <div class="modal-title">Laisser un avis</div>
+    <div class="modal-sub" id="modalProductName">Produit</div>
+    <div class="form-group">
+      <label class="form-label">Votre note</label>
+      <div class="star-select" id="starSelect">
+        <span class="star-opt" data-v="1" onclick="setRating(1)">★</span>
+        <span class="star-opt" data-v="2" onclick="setRating(2)">★</span>
+        <span class="star-opt" data-v="3" onclick="setRating(3)">★</span>
+        <span class="star-opt" data-v="4" onclick="setRating(4)">★</span>
+        <span class="star-opt" data-v="5" onclick="setRating(5)">★</span>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Votre prénom</label><input class="form-input" type="text" id="reviewName" placeholder="Ex: Ahmed"></div>
+    <div class="form-group"><label class="form-label">Votre avis</label><textarea class="form-input" id="reviewText" rows="4" placeholder="Partagez votre expérience…" style="resize:vertical"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-teal" onclick="submitReview()" style="flex:1">Publier l'avis</button>
+      <button class="btn btn-outline" onclick="closeModal('reviewModal')">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal" style="text-align:center;position:relative">
+    <button class="modal-close" onclick="closeModal('successModal')">✕</button>
+    <div class="success-anim">✓</div>
+    <div class="modal-title">Commande confirmée !</div>
+    <div class="modal-sub">Votre commande <strong id="orderNum"></strong> a été passée avec succès. Vous recevrez une confirmation par SMS. Suivez votre livraison en temps réel.</div>
+    <div style="background:var(--bg);border-radius:var(--rs);padding:14px;margin:16px 0;font-size:13px;text-align:left;">
+      <div style="font-weight:700;margin-bottom:8px;">Prochaines étapes :</div>
+      <div style="color:var(--muted);line-height:1.8;"> Confirmation envoyée par email<br>📦 Préparation sous 24h<br>🚚 Livraison sous 48-72h</div>
+    </div>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn btn-teal" onclick="closeModal('successModal');nav('track');setActive(null);setTimeout(trackOrder,100)">📦 Suivre ma commande</button>
+      <button class="btn btn-outline" onclick="closeModal('successModal');nav('home')">Accueil</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ TUTORIAL OVERLAY ══ -->
+<div id="tutorialOverlay" style="display:none">
+  <div id="tutorialBackdrop"></div>
+  <div id="tutorialBox">
+    <div id="tutorialArrow"></div>
+    <div id="tutorialContent">
+      <div id="tutorialStep"></div>
+      <div id="tutorialTitle"></div>
+      <div id="tutorialText"></div>
+      <div id="tutorialNav">
+        <button id="tutPrev" onclick="tutorialPrev()">← Précédent</button>
+        <span id="tutorialProgress"></span>
+        <button id="tutNext" onclick="tutorialNext()">Suivant →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</body>
+</html>
