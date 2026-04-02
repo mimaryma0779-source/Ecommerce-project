@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Digital Store - Accueil & Connexion</title>
+    <link rel="stylesheet" href="sombre.css">
+    <script src="sombre.js"></script>
     <style>
+
         /* ===== Reset & Base ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         
@@ -14,6 +17,196 @@
             overflow-x: hidden;
             color: #111110;
         }
+                /* Style du Hub Modal */
+.tm-hub-modal { width: 450px !important; border: 2px solid #497b89; }
+
+.tm-hub-grid { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+
+/* Le "Bouton" Card */
+.tm-hub-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px;
+  background: #ffffff;
+  border: 2px solid #e2e2df;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Effet de survol (clairement cliquable) */
+.tm-hub-card:hover {
+  border-color: #497b89;
+  background: #f0f7f9;
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(73, 123, 137, 0.15);
+}
+
+/* L'icône des 3 lignes (Menu) */
+.tm-hub-menu-icon {
+  font-size: 18px;
+  color: #497b89;
+  background: #eef2f3;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.tm-hub-info { flex: 1; }
+
+.tm-hub-name {
+  font-weight: 800;
+  color: #111;
+  font-size: 16px;
+  margin-bottom: 2px;
+}
+
+
+
+
+.tm-hub-text {
+  font-size: 12px;
+  color: #7a7a76;
+}
+
+/* La flèche à droite */
+.tm-hub-arrow {
+  font-size: 20px;
+  color: #497b89;
+  opacity: 0.5;
+  transition: transform 0.3s ease;
+}
+
+.tm-hub-card:hover .tm-hub-arrow {
+  opacity: 1;
+  transform: translateX(5px);
+}
+
+/* Petit badge de couleur sur le côté pour le style */
+.tm-hub-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #497b89;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tm-hub-card:hover::before {
+  opacity: 1;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   STYLE DU BOUTON MAÎTRE "Waw"
+═══════════════════════════════════════════════════════════════ */
+
+.tm-main-button {
+  /* Positionnement et dimensions */
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  
+  /* Couleurs et fond */
+  background: linear-gradient(135deg, #497b89, #5d9ba9);
+  color: #ffffff;
+  
+  /* Bordures et coins */
+  border: none;
+  border-radius: 99px; /* Forme pilule parfaite */
+  
+  /* Typographie */
+  font-family: 'Syne', sans-serif; /* Utilise la police Syne pour le titre */
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  text-transform: uppercase; /* Tout en majuscules pour le style */
+  
+  /* Interaction */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  /* Ombre douce */
+  box-shadow: 0 6px 16px rgba(73, 123, 137, 0.25);
+  
+  /* Empêche la sélection du texte */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* L'Emoji ✨ */
+.tm-btn-emoji {
+  font-size: 18px;
+  /* Animation de pétillement */
+  animation: tmEmojiSparkle 3s ease-in-out infinite;
+}
+
+/* Le Texte */
+.tm-btn-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* La petite flèche ▾ */
+.tm-btn-arrow {
+  font-size: 12px;
+  opacity: 0.7;
+  transition: transform 0.3s ease;
+}
+
+/* ════════════════════════════════
+   EFFETS INTERACTIFS (HOVER)
+════════════════════════════════ */
+
+.tm-main-button:hover {
+  /* Change légèrement la couleur */
+  background: linear-gradient(135deg, #5d9ba9, #497b89);
+  
+  /* Se soulève un peu */
+  transform: translateY(-3px);
+  
+  /* L'ombre devient plus forte */
+  box-shadow: 0 10px 25px rgba(73, 123, 137, 0.35);
+}
+
+/* Quand on clique (Active) */
+.tm-main-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 5px 15px rgba(73, 123, 137, 0.3);
+}
+
+/* Quand le Hub est ouvert, on peut faire tourner la flèche */
+#tm-hub-overlay.open ~ .tm-main-button .tm-btn-arrow {
+  transform: rotate(180deg);
+}
+
+/* ════════════════════════════════
+   ANIMATION DE L'EMOJI
+════════════════════════════════ */
+
+@keyframes tmEmojiSparkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotate(15deg);
+    opacity: 0.8;
+  }
+}
+
 
         /* ===== Animations ===== */
         @keyframes float {
@@ -125,20 +318,108 @@
             .main-title { font-size: 2.5rem; }
             .tutorial-section { padding: 30px 20px; }
         }
+ 
+.dark-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    
+    width: 55px;
+    height: 55px;
+    
+    border: none;
+    border-radius: 50%;
+    
+    background: linear-gradient(135deg, #497b89, #22c55e);
+    color: white;
+    
+    font-size: 1.5rem;
+    cursor: pointer;
+    
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    
+    z-index: 1000;
+    
+    transition: all 0.3s ease;
+}
+
+/* Hover effect */
+.dark-btn:hover {
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+}
+
+/* Dark mode version */
+body.dark-mode .dark-btn {
+    background: linear-gradient(135deg, #111, #333);
+}
     </style>
 </head>
+
 <body>
+    
 
     <div class="bg-animated">
         <div class="bg-circle bg-circle-1"></div>
         <div class="bg-circle bg-circle-2"></div>
         <div class="bg-circle bg-circle-3"></div>
     </div>
-
+    
     <div class="container">
         
         <div id="homePage">
+
+
+
+<button class="tm-main-button" onclick="openTutorialHub()">
+  <span class="tm-btn-emoji">✨</span>
+  <span class="tm-btn-text">Tutoriels <span class="tm-btn-arrow">▾</span></span>
+</button>
+
+<div id="tm-hub-overlay" class="tm-overlay" onclick="closeTutorialHub(event)">
+  <div class="tm-modal tm-hub-modal">
+    <div class="tm-header">
+      <div>
+        <div class="tm-badge">Centre d'aide</div>
+        <div class="tm-title">Choisissez un tutoriel</div>
+      </div>
+      <button class="tm-close" onclick="closeTutorialHub()">✕</button>
+    </div>
+    
+    <div class="tm-hub-grid">
+      <div class="tm-hub-card" onclick="startFromHub('catalog')">
+        <div class="tm-hub-menu-icon">☰</div> 
+        <div class="tm-hub-info">
+          <div class="tm-hub-name">📦 Le Catalogue</div>
+          <div class="tm-hub-text">Apprendre à chercher et filtrer</div>
+        </div>
+        <div class="tm-hub-arrow">→</div>
+      </div>
+
+      <div class="tm-hub-card" onclick="startFromHub('cart')">
+        <div class="tm-hub-menu-icon">☰</div>
+        <div class="tm-hub-info">
+          <div class="tm-hub-name">🛒 Le Panier</div>
+          <div class="tm-hub-text">Gérer vos articles et promos</div>
+        </div>
+        <div class="tm-hub-arrow">→</div>
+      </div>
+
+      <div class="tm-hub-card" onclick="startFromHub('payment')">
+        <div class="tm-hub-menu-icon">☰</div>
+        <div class="tm-hub-info">
+          <div class="tm-hub-name">💰 Le Paiement</div>
+          <div class="tm-hub-text">Méthodes de paiement sécurisées</div>
+        </div>
+        <div class="tm-hub-arrow">→</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
             <header class="logo-section text-center">
+                <button id="darkModeToggle" class="dark-btn">🌙</button>
                 <div class="logo-wrapper">
                     <div class="logo-glow"></div>
                     <img src="images/logo.png" alt="Digital Store Logo" class="logo-img">
@@ -173,7 +454,7 @@
             </section>
 
             <div class="options-grid">
-                <div class="option-card" onclick="window.location.href='index4.html'"">
+                <div class="option-card" onclick="window.location.href='FenetrePrincipale.html'">
                     <div class="option-icon-box">👁️</div>
                     <h3>Visiteur</h3>
                     <p>Explorez notre catalogue complet, comparez les prix et les spécifications sans créer de compte.</p>
@@ -280,7 +561,7 @@
     </div>
 
     <script>
-        // Gestion de l'affichage des sections
+     // Gestion de l'affichage des sections
         function showView(viewId) {
             document.getElementById('homePage').classList.add('hidden');
             document.getElementById('loginForm').classList.add('hidden');
@@ -302,6 +583,13 @@
             if(name) alert('Félicitations ' + name + ', votre compte est prêt !');
             else alert('Veuillez remplir tous les champs');
         }
+
+
+
+        const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
+       if (isDarkMode) document.body.classList.add('dark-mode');
+
     </script>
+    <script src="FenetreDemarrage.js"></script>
 </body>
 </html>
