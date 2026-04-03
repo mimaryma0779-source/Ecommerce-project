@@ -77,10 +77,18 @@ nav{position:sticky;top:0;z-index:200; background: var(--teal-light);;backdrop-f
 .nav-links{display:flex;gap:2px;flex:1;overflow:hidden}
 .nav-link{padding:6px 11px;border-radius:var(--rs);font-size:13px;font-weight:500;color:var(--teal);cursor:pointer;border:none;background:transparent;transition:all var(--t);white-space:nowrap;font-family:inherit}
 .nav-link:hover,.nav-link.active{color:#fff;background:var(--teal)}
-.lang-switcher{display:flex;align-items:center;gap:2px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:2px;flex-shrink:0}
-.lang-btn{padding:4px 9px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:inherit;transition:all var(--t)}
-.lang-btn.active{background:var(--teal);color:#fff}
-.lang-btn:hover:not(.active){background:var(--border);color:var(--text)}
+.lang-switcher{position:relative;flex-shrink:0}
+.lang-dropdown-btn{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:var(--rs);background:var(--surface2);border:1px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;color:var(--text);font-family:inherit;transition:all var(--t);white-space:nowrap}
+.lang-dropdown-btn:hover{border-color:var(--teal);background:var(--teal-light);color:var(--teal)}
+.lang-dropdown-btn .lang-flag{font-size:14px}
+.lang-dropdown-btn .lang-arrow{font-size:9px;color:var(--muted);transition:transform .2s}
+.lang-dropdown-btn.open .lang-arrow{transform:rotate(180deg)}
+.lang-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-lg);overflow:hidden;z-index:500;min-width:130px}
+.lang-menu.open{display:block;animation:fadeIn .15s ease}
+.lang-item{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);transition:background var(--t);border:none;background:transparent;width:100%;font-family:inherit;text-align:left}
+.lang-item:hover{background:var(--teal-light);color:var(--teal)}
+.lang-item.active{background:var(--teal);color:#fff}
+.lang-item .li-flag{font-size:15px}
 .nav-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
 
 /* Dark toggle */
@@ -808,9 +816,16 @@ h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-
       <span id="darkIcon">◑</span>
     </button>
     <div class="lang-switcher" id="langSwitcher">
-      <button class="lang-btn active" id="langFR" onclick="setLang('fr')">FR</button>
-      <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
-      <button class="lang-btn" id="langAR" onclick="setLang('ar')">ع</button>
+      <button class="lang-dropdown-btn" id="langDropBtn" onclick="toggleLangMenu()">
+        <span class="lang-flag" id="langFlag">🇫🇷</span>
+        <span id="langLabel">FR</span>
+        <span class="lang-arrow">▼</span>
+      </button>
+      <div class="lang-menu" id="langMenu">
+        <button class="lang-item active" id="langFR" onclick="setLang('fr')"><span class="li-flag">🇫🇷</span> Français</button>
+        <button class="lang-item" id="langEN" onclick="setLang('en')"><span class="li-flag">🇬🇧</span> English</button>
+        <button class="lang-item" id="langAR" onclick="setLang('ar')"><span class="li-flag">🇩🇿</span> العربية</button>
+      </div>
     </div>
     <button class="tut-nav-btn" id="guideBtn" onclick="startTutorial()">Guide</button>
     <button class="connect-btn" id="connectBtn" onclick="openAuthModal()">
@@ -826,14 +841,15 @@ h2{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;letter-spacing:-
 </nav>
 
 <div class="mobile-nav" id="mobileNav">
-  <button class="nav-link" onclick="nav('home');closeMobileNav()">Accueil</button>
-  <button class="nav-link" onclick="nav('catalog');closeMobileNav()">Catalogue</button>
-  <button class="nav-link" onclick="nav('wishlist');closeMobileNav()">Wishlist</button>
-  <button class="nav-link" onclick="nav('compare');closeMobileNav()">Comparateur</button>
-  <button class="nav-link" onclick="nav('orders');closeMobileNav()"> Commandes</button>
-  <button class="nav-link" onclick="nav('loyalty');closeMobileNav()">Fidélité</button>
-  <button class="nav-link" onclick="nav('track');closeMobileNav()">Suivi</button>
-  <button class="nav-link" onclick="toggleDarkMode();closeMobileNav()" id="mobileThemeBtn">Mode sombre</button>
+  <button class="nav-link" id="mnl-home" onclick="nav('home');closeMobileNav()">Accueil</button>
+  <button class="nav-link" id="mnl-catalog" onclick="nav('catalog');closeMobileNav()">Catalogue</button>
+  <button class="nav-link" id="mnl-wish" onclick="nav('wishlist');closeMobileNav()">Wishlist</button>
+  <button class="nav-link" id="mnl-compare" onclick="nav('compare');closeMobileNav()">Comparer</button>
+  <button class="nav-link" id="mnl-orders" onclick="nav('orders');closeMobileNav()">Commandes</button>
+  <button class="nav-link" id="mnl-loyalty" onclick="nav('loyalty');closeMobileNav()">Fidélité</button>
+  <button class="nav-link" id="mnl-track" onclick="nav('track');closeMobileNav()">Suivi</button>
+  <button class="nav-link" id="mnl-guide" onclick="startTutorial();closeMobileNav()">Guide</button>
+  <button class="nav-link" onclick="toggleDarkMode();closeMobileNav()" id="mobileThemeBtn">◑ Mode sombre</button>
 </div>
 
 <div id="toast"></div>
@@ -1208,7 +1224,8 @@ function toggleDarkMode(){
   const ico=dark?'◑':'◐';
   document.getElementById('darkIcon').textContent=ico;
   const mb=document.getElementById('mobileThemeBtn');
-  if(mb) mb.textContent=(dark?'◑':'◐')+' Mode '+(dark?'sombre':'clair');
+  const L=LANG[currentLang]||LANG.fr;
+  if(mb) mb.textContent=(dark?'◑':'◐')+' '+(L.mobileTheme||'Mode')+' '+(dark?(L.mobileThemeDark||'sombre'):(L.mobileThemeLight||'clair'));
   localStorage.setItem('ds-theme',dark?'light':'dark');
   showToast(dark?'◐ Mode clair activé':'◑ Mode sombre activé');
 }
@@ -1220,7 +1237,8 @@ function toggleDarkMode(){
     const el=document.getElementById('darkIcon');
     if(el) el.textContent=s==='dark'?'◐':'◑';
     const mb=document.getElementById('mobileThemeBtn');
-    if(mb) mb.textContent=(s==='dark'?'◐':'◑')+' Mode '+(s==='dark'?'clair':'sombre');
+    const L=LANG[currentLang]||LANG.fr;
+    if(mb) mb.textContent=(s==='dark'?'◐':'◑')+' '+(L.mobileTheme||'Mode')+' '+(s==='dark'?(L.mobileThemeLight||'clair'):(L.mobileThemeDark||'sombre'));
   });
 })();
 
@@ -2015,18 +2033,38 @@ const LANG = {
     promoApplied:'Code promo appliqué ! -10%',
     promoInvalid:'Code promo invalide',
     // Home / Hero
+    heroEyebrow:'Nouveau — Livraison en 48h partout en Algérie',
     heroTitle:'Le Meilleur Matériel',
     heroTitle2:'Informatique en Algérie',
     heroSub:'Livraison 48h · Garantie 2 ans · Paiement sécurisé',
     heroCta:'Explorer le catalogue →',
     heroSecondary:'En savoir plus',
+    heroPanelLabel:'Produits Phares',
     // Sections
-    dealsTitle:'Offres Flash',
-    dealsEnds:'Fin dans :',
+    dealsEyebrow:'🔥 Offre flash limitée',
+    dealsTitle:'jusqu\'à −30% sur les GPU',
+    dealsSub:'RTX 4070 Super, RX 7900 XTX et bien plus — stock limité !',
+    dealsViewBtn:'Voir les offres →',
+    dealsH:'Heures', dealsM:'Min', dealsS:'Sec',
     popularTitle:'Produits Populaires',
     newTitle:'Nouveautés',
     promoTitle:'Promotions',
     seeAll:'Voir tout →',
+    catsTitle:'Catégories',
+    // Stats
+    stat1:'Produits en stock', stat2:'Clients satisfaits', stat3:'Années de confiance', stat4:'Wilayas livrées',
+    // Categories
+    catScreens:'Écrans', catCPU:'Processeurs', catPeripheral:'Périphériques',
+    catGPU:'Cartes graphiques', catStorage:'Stockage', catRAM:'Mémoire RAM',
+    catNetwork:'Réseau', catCase:'Boîtiers & Alim.',
+    // Sidebar filters
+    sbCat:'Catégorie', sbPrice:'Prix (DA)', sbAvail:'Disponibilité',
+    sbRating:'Note minimum', sbAll:'Tout', sbInStock:'En stock uniquement',
+    sbOnSale:'En promotion', sbAllRatings:'Toutes notes',
+    sbMin:'Min', sbMax:'Max',
+    // Catalog bar
+    sortDefault:'Trier par défaut', sortPriceAsc:'Prix croissant',
+    sortPriceDesc:'Prix décroissant', sortName:'Nom A–Z', sortRating:'Mieux notés',
     // Product card
     addCart:'Ajouter au panier',
     addWish:'♡',
@@ -2043,6 +2081,7 @@ const LANG = {
     cartApply:'Appliquer',
     cartDiscount:'Réduction',
     cartTotal:'Total TTC',
+    cartPoints:'Points à gagner',
     cartCheckout:'Passer la commande',
     cartSafe:'Paiement 100% sécurisé · CCP, CIB, Dahabia',
     // Track
@@ -2056,36 +2095,93 @@ const LANG = {
     compareTitle:'⚖️ Comparateur de produits',
     // Loyalty
     loyaltyTitle:'Programme de fidélité',
-    // Payment
+    loyaltySub:'Gagnez des points à chaque achat et échangez-les contre des récompenses.',
+    // Payment modal
+    payTitle:'Paiement sécurisé',
     paySecure:'Connexion SSL 256 bits — Vos données sont protégées',
-    payRecap:'Récapitulatif de commande',
+    payRecap:'Récapitulatif',
     payTotalTTC:'Total TTC',
-    payDelivery:'📦 Adresse de livraison',
+    payDelivery:'Adresse de livraison',
     payFirst:'Prénom', payLast:'Nom', payPhone:'Téléphone',
     payAddr:'Adresse complète', payWilaya:'Wilaya', payPostal:'Code postal',
+    paySelect:'Sélectionner...',
     payMethod:'Méthode de paiement',
+    payCIBBtn:'CIB',
+    payDahBtn:'Dahabia',
+    payCCPBtn:'CCP',
+    payCODBtn:'Livraison',
+    // CIB panel
+    payCardNum:'Numéro de carte',
+    payCardName:'Nom du titulaire',
+    payCardExp:'Expiration',
+    payCardCVV:'CVV',
+    payCardHolder:'VOTRE NOM',
+    // Dahabia
+    payDahInfo:'Paiement traité via le réseau Satim sécurisé.',
+    payDahNum:'Numéro Dahabia',
+    // CCP
+    payCCPTitle:'Virement CCP / Baridimob',
+    payCCPStep1:'Notez votre numéro de commande',
+    payCCPStep2:'Virez vers notre compte CCP',
+    payCCPStep3:'Envoyez la preuve par WhatsApp ou email',
+    payCCPMyNum:'Votre numéro CCP',
+    // COD
     payCOD:'Paiement à la livraison',
     payCODDesc:'Payez en espèces au livreur. Aucune info bancaire requise.',
     payConfirm:'🔒 Confirmer et payer',
-    // Footer stats
-    stat1:'Produits en stock',stat2:'Clients satisfaits',stat3:'Années de confiance',stat4:'Wilayas livrées',
-    // Search
-    searchPlaceholder:'Rechercher un produit, une marque…',
-    sortLabel:'Trier par',
-    sortPop:'Popularité', sortPriceLow:'Prix croissant', sortPriceHigh:'Prix décroissant', sortRating:'Note',
-    filterAll:'Tous',
-    // Detail
+    // Detail page
+    breadHome:'Accueil',
+    breadCatalog:'Catalogue',
+    detailStock:'✓ En stock — Livraison sous 48h',
+    detailQty:'Quantité',
     detailAddCart:'🛒 Ajouter au panier',
-    detailDelivery:'Livraison 48h', detailReturn:'Retour 30j', detailWarranty:'Garantie 2 ans', detailPaySafe:'Paiement sécurisé',
+    detailAlertBtn:'Alerter baisse de prix',
+    detailAlertActive:'🔔 Alerte active ✓',
+    detailDelivery:'Livraison 48h', detailReturn:'Retour 30j',
+    detailWarranty:'🛡️ Garantie 2 ans', detailPaySafe:'🔒 Paiement sécurisé',
     reviewsTitle:'Avis clients',
     reviewLeave:'✍️ Laisser un avis',
-    qaTitle:'Questions & Réponses',
+    qaTitle:'❓ Questions & Réponses',
     qaAsk:'✍️ Poser une question',
     recoTitle:'💡 Vous aimerez aussi',
     alertBtn:'🔕 Alerter baisse de prix',
+    // Review modal
+    reviewModalTitle:'Laisser un avis',
+    reviewYourRating:'Votre note',
+    reviewYourName:'Votre prénom',
+    reviewYourText:'Votre avis',
+    reviewTextPlaceholder:'Partagez votre expérience…',
+    reviewSubmit:'Publier l\'avis',
+    reviewCancel:'Annuler',
+    // Question modal
+    qModalTitle:'❓ Poser une question',
+    qModalSub:'Notre équipe vous répond sous 24h ouvrées.',
+    qModalName:'Votre prénom',
+    qModalText:'Votre question',
+    qModalTextPh:'Ex: Ce produit est-il compatible avec…',
+    qModalSend:'Envoyer →',
+    qModalCancel:'Annuler',
+    // Success modal
+    successTitle:'Commande confirmée !',
+    successTrack:'📦 Suivre',
+    successOrders:'Commandes',
     // Orders
+    ordersTitle:'Mes commandes',
     ordersEmpty:'Aucune commande pour l\'instant',
     ordersShop:'Faire mes premiers achats',
+    ordersFollow:'📦 Suivre',
+    ordersReorder:'🔁 Recommander',
+    // Search
+    searchPlaceholder:'Rechercher un produit, une marque…',
+    sortLabel:'Trier par',
+    sortPop:'Popularité', sortPriceLow:'Prix croissant', sortPriceHigh:'Prix décroissant',
+    filterAll:'Tous',
+    // Compare bar
+    cbCompareBtn:'Comparer maintenant →',
+    cbClearBtn:'Effacer',
+    cbEmpty:'Ajouter un produit…',
+    // Price drop notif
+    pdnTitle:'Baisse de prix !',
     // Mobile nav
     mobileTheme:'Mode',
     mobileThemeDark:'sombre', mobileThemeLight:'clair',
@@ -2112,17 +2208,33 @@ const LANG = {
     cartEmpty:'Your cart is empty',
     promoApplied:'Promo code applied! -10%',
     promoInvalid:'Invalid promo code',
+    heroEyebrow:'New — 48h delivery across Algeria',
     heroTitle:'The Best Computer',
     heroTitle2:'Hardware in Algeria',
     heroSub:'48h Delivery · 2-Year Warranty · Secure Payment',
     heroCta:'Explore catalog →',
     heroSecondary:'Learn more',
-    dealsTitle:'Flash Deals',
-    dealsEnds:'Ends in:',
+    heroPanelLabel:'Featured Products',
+    dealsEyebrow:'🔥 Limited flash offer',
+    dealsTitle:'Up to −30% on GPUs',
+    dealsSub:'RTX 4070 Super, RX 7900 XTX and more — limited stock!',
+    dealsViewBtn:'View offers →',
+    dealsH:'Hours', dealsM:'Min', dealsS:'Sec',
     popularTitle:'Popular Products',
     newTitle:'New Arrivals',
     promoTitle:'Promotions',
     seeAll:'See all →',
+    catsTitle:'Categories',
+    stat1:'Products in stock', stat2:'Happy customers', stat3:'Years of trust', stat4:'Provinces served',
+    catScreens:'Monitors', catCPU:'Processors', catPeripheral:'Peripherals',
+    catGPU:'Graphics Cards', catStorage:'Storage', catRAM:'RAM Memory',
+    catNetwork:'Networking', catCase:'Cases & PSU',
+    sbCat:'Category', sbPrice:'Price (DA)', sbAvail:'Availability',
+    sbRating:'Min. rating', sbAll:'All', sbInStock:'In stock only',
+    sbOnSale:'On sale', sbAllRatings:'All ratings',
+    sbMin:'Min', sbMax:'Max',
+    sortDefault:'Default', sortPriceAsc:'Price: low to high',
+    sortPriceDesc:'Price: high to low', sortName:'Name A–Z', sortRating:'Best rated',
     addCart:'Add to cart',
     addWish:'♡',
     inStock:'In stock',
@@ -2137,6 +2249,7 @@ const LANG = {
     cartApply:'Apply',
     cartDiscount:'Discount',
     cartTotal:'Total incl. VAT',
+    cartPoints:'Points to earn',
     cartCheckout:'Proceed to checkout',
     cartSafe:'100% secure payment · CCP, CIB, Dahabia',
     trackTitle:'📦 Order Tracking',
@@ -2146,31 +2259,80 @@ const LANG = {
     wishTitle:'My Wishlist ♡',
     compareTitle:'⚖️ Product Comparator',
     loyaltyTitle:'Loyalty Program',
+    loyaltySub:'Earn points with every purchase and redeem them for rewards.',
+    payTitle:'Secure Payment',
     paySecure:'SSL 256-bit — Your data is protected',
     payRecap:'Order Summary',
     payTotalTTC:'Total incl. VAT',
-    payDelivery:'📦 Delivery Address',
+    payDelivery:'Delivery Address',
     payFirst:'First name', payLast:'Last name', payPhone:'Phone',
     payAddr:'Full address', payWilaya:'Province', payPostal:'Postal code',
+    paySelect:'Select...',
     payMethod:'Payment method',
+    payCIBBtn:'CIB',
+    payDahBtn:'Dahabia',
+    payCCPBtn:'CCP',
+    payCODBtn:'On delivery',
+    payCardNum:'Card number',
+    payCardName:'Cardholder name',
+    payCardExp:'Expiry',
+    payCardCVV:'CVV',
+    payCardHolder:'YOUR NAME',
+    payDahInfo:'Payment processed via the secure Satim network.',
+    payDahNum:'Dahabia number',
+    payCCPTitle:'CCP / Baridimob Transfer',
+    payCCPStep1:'Note your order number',
+    payCCPStep2:'Transfer to our CCP account',
+    payCCPStep3:'Send proof via WhatsApp or email',
+    payCCPMyNum:'Your CCP number',
     payCOD:'Cash on delivery',
     payCODDesc:'Pay cash to the delivery person. No banking info required.',
     payConfirm:'🔒 Confirm and pay',
-    stat1:'Products in stock',stat2:'Happy customers',stat3:'Years of trust',stat4:'Provinces served',
-    searchPlaceholder:'Search a product, brand…',
-    sortLabel:'Sort by',
-    sortPop:'Popularity', sortPriceLow:'Price: low to high', sortPriceHigh:'Price: high to low', sortRating:'Rating',
-    filterAll:'All',
+    breadHome:'Home',
+    breadCatalog:'Catalog',
+    detailStock:'✓ In stock — Ships within 48h',
+    detailQty:'Quantity',
     detailAddCart:'🛒 Add to cart',
-    detailDelivery:'48h Delivery', detailReturn:'30-day Return', detailWarranty:'2-Year Warranty', detailPaySafe:'Secure Payment',
+    detailAlertBtn:'Alert price drop',
+    detailAlertActive:'🔔 Alert active ✓',
+    detailDelivery:'48h Delivery', detailReturn:'30-day Return',
+    detailWarranty:'🛡️ 2-Year Warranty', detailPaySafe:'🔒 Secure Payment',
     reviewsTitle:'Customer Reviews',
     reviewLeave:'✍️ Leave a review',
-    qaTitle:'Q&A',
+    qaTitle:'❓ Q&A',
     qaAsk:'✍️ Ask a question',
     recoTitle:'💡 You might also like',
     alertBtn:'🔕 Alert price drop',
+    reviewModalTitle:'Leave a Review',
+    reviewYourRating:'Your rating',
+    reviewYourName:'Your first name',
+    reviewYourText:'Your review',
+    reviewTextPlaceholder:'Share your experience…',
+    reviewSubmit:'Publish review',
+    reviewCancel:'Cancel',
+    qModalTitle:'❓ Ask a Question',
+    qModalSub:'Our team replies within 24 business hours.',
+    qModalName:'Your first name',
+    qModalText:'Your question',
+    qModalTextPh:'e.g. Is this product compatible with…',
+    qModalSend:'Send →',
+    qModalCancel:'Cancel',
+    successTitle:'Order Confirmed!',
+    successTrack:'📦 Track',
+    successOrders:'Orders',
+    ordersTitle:'My Orders',
     ordersEmpty:'No orders yet',
     ordersShop:'Start shopping',
+    ordersFollow:'📦 Track',
+    ordersReorder:'🔁 Reorder',
+    searchPlaceholder:'Search a product, brand…',
+    sortLabel:'Sort by',
+    sortPop:'Popularity', sortPriceLow:'Price: low to high', sortPriceHigh:'Price: high to low',
+    filterAll:'All',
+    cbCompareBtn:'Compare now →',
+    cbClearBtn:'Clear',
+    cbEmpty:'Add a product…',
+    pdnTitle:'Price Drop!',
     mobileTheme:'Theme',
     mobileThemeDark:'dark', mobileThemeLight:'light',
   },
@@ -2196,17 +2358,33 @@ const LANG = {
     cartEmpty:'سلتك فارغة',
     promoApplied:'تم تطبيق رمز الخصم! -10%',
     promoInvalid:'رمز الخصم غير صالح',
+    heroEyebrow:'جديد — توصيل في 48 ساعة عبر الجزائر',
     heroTitle:'أفضل مواد',
     heroTitle2:'الإعلام الآلي في الجزائر',
     heroSub:'توصيل 48 ساعة · ضمان سنتان · دفع آمن',
     heroCta:'→ استكشاف الكتالوج',
     heroSecondary:'اعرف أكثر',
-    dealsTitle:'عروض سريعة',
-    dealsEnds:'تنتهي خلال:',
+    heroPanelLabel:'المنتجات المميزة',
+    dealsEyebrow:'🔥 عرض محدود الوقت',
+    dealsTitle:'حتى −30% على كروت الشاشة',
+    dealsSub:'RTX 4070 Super وRX 7900 XTX والمزيد — كميات محدودة!',
+    dealsViewBtn:'→ عرض العروض',
+    dealsH:'ساعات', dealsM:'دقيقة', dealsS:'ثانية',
     popularTitle:'المنتجات الشائعة',
     newTitle:'المنتجات الجديدة',
     promoTitle:'التخفيضات',
     seeAll:'→ عرض الكل',
+    catsTitle:'الفئات',
+    stat1:'منتج متاح', stat2:'عميل راضٍ', stat3:'سنوات من الثقة', stat4:'ولاية تُسلَّم إليها',
+    catScreens:'الشاشات', catCPU:'المعالجات', catPeripheral:'الملحقات',
+    catGPU:'كروت الشاشة', catStorage:'التخزين', catRAM:'ذاكرة RAM',
+    catNetwork:'الشبكات', catCase:'الهياكل والطاقة',
+    sbCat:'الفئة', sbPrice:'السعر (دج)', sbAvail:'التوفر',
+    sbRating:'أدنى تقييم', sbAll:'الكل', sbInStock:'المتوفر فقط',
+    sbOnSale:'التخفيضات', sbAllRatings:'كل التقييمات',
+    sbMin:'أدنى', sbMax:'أقصى',
+    sortDefault:'الترتيب الافتراضي', sortPriceAsc:'السعر: تصاعدي',
+    sortPriceDesc:'السعر: تنازلي', sortName:'الاسم أ–ي', sortRating:'الأعلى تقييماً',
     addCart:'أضف للسلة',
     addWish:'♡',
     inStock:'متوفر',
@@ -2221,6 +2399,7 @@ const LANG = {
     cartApply:'تطبيق',
     cartDiscount:'الخصم',
     cartTotal:'الإجمالي شامل الضريبة',
+    cartPoints:'النقاط المكتسبة',
     cartCheckout:'إتمام الطلب',
     cartSafe:'دفع آمن 100% · CCP، CIB، Dahabia',
     trackTitle:'📦 تتبع الطلب',
@@ -2230,31 +2409,80 @@ const LANG = {
     wishTitle:'مفضلتي ♡',
     compareTitle:'⚖️ مقارنة المنتجات',
     loyaltyTitle:'برنامج الولاء',
+    loyaltySub:'اكسب نقاطاً مع كل عملية شراء واستبدلها بمكافآت.',
+    payTitle:'دفع آمن',
     paySecure:'SSL 256 بت — بياناتك محمية',
     payRecap:'ملخص الطلب',
     payTotalTTC:'الإجمالي شامل الضريبة',
-    payDelivery:'📦 عنوان التسليم',
+    payDelivery:'عنوان التسليم',
     payFirst:'الاسم', payLast:'اللقب', payPhone:'الهاتف',
     payAddr:'العنوان الكامل', payWilaya:'الولاية', payPostal:'الرمز البريدي',
+    paySelect:'اختر...',
     payMethod:'طريقة الدفع',
+    payCIBBtn:'CIB',
+    payDahBtn:'داهبية',
+    payCCPBtn:'CCP',
+    payCODBtn:'عند التسليم',
+    payCardNum:'رقم البطاقة',
+    payCardName:'اسم حامل البطاقة',
+    payCardExp:'تاريخ الانتهاء',
+    payCardCVV:'رمز CVV',
+    payCardHolder:'اسمك',
+    payDahInfo:'تتم المعالجة عبر شبكة Satim الآمنة.',
+    payDahNum:'رقم بطاقة داهبية',
+    payCCPTitle:'تحويل CCP / بريدي موب',
+    payCCPStep1:'سجّل رقم طلبك',
+    payCCPStep2:'حوّل إلى حسابنا CCP',
+    payCCPStep3:'أرسل الإثبات عبر واتساب أو البريد',
+    payCCPMyNum:'رقم CCP الخاص بك',
     payCOD:'الدفع عند الاستلام',
     payCODDesc:'ادفع نقداً للمندوب. لا معلومات مصرفية مطلوبة.',
     payConfirm:'🔒 تأكيد ودفع',
-    stat1:'منتج متاح',stat2:'عميل راضٍ',stat3:'سنوات من الثقة',stat4:'ولاية تُسلَّم إليها',
-    searchPlaceholder:'ابحث عن منتج أو علامة تجارية…',
-    sortLabel:'ترتيب حسب',
-    sortPop:'الشعبية', sortPriceLow:'السعر: تصاعدي', sortPriceHigh:'السعر: تنازلي', sortRating:'التقييم',
-    filterAll:'الكل',
+    breadHome:'الرئيسية',
+    breadCatalog:'الكتالوج',
+    detailStock:'✓ متوفر — يُشحن خلال 48 ساعة',
+    detailQty:'الكمية',
     detailAddCart:'🛒 أضف للسلة',
-    detailDelivery:'توصيل 48 ساعة', detailReturn:'إرجاع 30 يوماً', detailWarranty:'ضمان سنتان', detailPaySafe:'دفع آمن',
+    detailAlertBtn:'تنبيه انخفاض السعر',
+    detailAlertActive:'🔔 التنبيه مفعّل ✓',
+    detailDelivery:'توصيل 48 ساعة', detailReturn:'إرجاع 30 يوماً',
+    detailWarranty:'🛡️ ضمان سنتان', detailPaySafe:'🔒 دفع آمن',
     reviewsTitle:'آراء العملاء',
     reviewLeave:'✍️ اترك تقييماً',
-    qaTitle:'الأسئلة والأجوبة',
+    qaTitle:'❓ الأسئلة والأجوبة',
     qaAsk:'✍️ اطرح سؤالاً',
     recoTitle:'💡 قد يعجبك أيضاً',
     alertBtn:'🔕 تنبيه انخفاض السعر',
+    reviewModalTitle:'اترك تقييماً',
+    reviewYourRating:'تقييمك',
+    reviewYourName:'اسمك الأول',
+    reviewYourText:'رأيك',
+    reviewTextPlaceholder:'شارك تجربتك…',
+    reviewSubmit:'نشر التقييم',
+    reviewCancel:'إلغاء',
+    qModalTitle:'❓ طرح سؤال',
+    qModalSub:'يرد فريقنا خلال 24 ساعة عمل.',
+    qModalName:'اسمك الأول',
+    qModalText:'سؤالك',
+    qModalTextPh:'مثال: هل هذا المنتج متوافق مع…',
+    qModalSend:'→ إرسال',
+    qModalCancel:'إلغاء',
+    successTitle:'تم تأكيد الطلب!',
+    successTrack:'📦 تتبع',
+    successOrders:'الطلبات',
+    ordersTitle:'طلباتي',
     ordersEmpty:'لا توجد طلبات حتى الآن',
     ordersShop:'ابدأ التسوق',
+    ordersFollow:'📦 تتبع',
+    ordersReorder:'🔁 إعادة الطلب',
+    searchPlaceholder:'ابحث عن منتج أو علامة تجارية…',
+    sortLabel:'ترتيب حسب',
+    sortPop:'الشعبية', sortPriceLow:'السعر: تصاعدي', sortPriceHigh:'السعر: تنازلي',
+    filterAll:'الكل',
+    cbCompareBtn:'قارن الآن →',
+    cbClearBtn:'مسح',
+    cbEmpty:'أضف منتجاً…',
+    pdnTitle:'انخفاض السعر!',
     mobileTheme:'الوضع',
     mobileThemeDark:'داكن', mobileThemeLight:'فاتح',
   }
@@ -2262,14 +2490,39 @@ const LANG = {
 
 function T(key){ return (LANG[currentLang]||LANG.fr)[key] || (LANG.fr)[key] || key; }
 
+function toggleLangMenu(){
+  const btn=document.getElementById('langDropBtn');
+  const menu=document.getElementById('langMenu');
+  btn.classList.toggle('open');
+  menu.classList.toggle('open');
+}
+// Close lang menu when clicking outside
+document.addEventListener('click',function(e){
+  const ls=document.getElementById('langSwitcher');
+  if(ls&&!ls.contains(e.target)){
+    document.getElementById('langDropBtn').classList.remove('open');
+    document.getElementById('langMenu').classList.remove('open');
+  }
+});
+
 function setLang(lang){
   currentLang = lang;
   localStorage.setItem('ds-lang', lang);
-  // Update lang buttons
+  // Update dropdown button
+  const flags={fr:'🇫🇷',en:'🇬🇧',ar:'🇩🇿'};
+  const labels={fr:'FR',en:'EN',ar:'ع'};
+  const flagEl=document.getElementById('langFlag');
+  const labelEl=document.getElementById('langLabel');
+  if(flagEl) flagEl.textContent=flags[lang]||'🇫🇷';
+  if(labelEl) labelEl.textContent=labels[lang]||'FR';
+  // Update active state on items
   ['fr','en','ar'].forEach(l=>{
     const b=document.getElementById('lang'+l.toUpperCase());
     if(b) b.classList.toggle('active', l===lang);
   });
+  // Close the menu
+  document.getElementById('langDropBtn').classList.remove('open');
+  document.getElementById('langMenu').classList.remove('open');
   // RTL for Arabic
   document.documentElement.lang = lang==='ar'?'ar':lang==='en'?'en':'fr';
   document.documentElement.dir  = lang==='ar'?'rtl':'ltr';
@@ -2285,8 +2538,21 @@ function applyTranslations(){
     'nl-loyalty':'navLoyalty'
   };
   Object.entries(nmap).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=L[key];});
-  // Guide button
-  const gb=document.getElementById('guideBtn');if(gb)gb.textContent=L.navGuide;
+  // Guide button (desktop)
+  const gb=document.getElementById('guideBtn');if(gb)gb.textContent='✨ '+L.navGuide;
+  // Mobile nav links
+  const mnmap={
+    'mnl-home':'navHome','mnl-catalog':'navCatalog','mnl-wish':'navWishlist',
+    'mnl-compare':'navCompare','mnl-orders':'navOrders','mnl-track':'navTrack',
+    'mnl-loyalty':'navLoyalty','mnl-guide':'navGuide'
+  };
+  Object.entries(mnmap).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=L[key];});
+  // Mobile theme toggle button
+  const mThemeBtn=document.getElementById('mobileThemeBtn');
+  if(mThemeBtn){
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    mThemeBtn.textContent=(isDark?'◐':'◑')+' '+(L.mobileTheme||'Mode')+' '+(isDark?(L.mobileThemeLight||'clair'):(L.mobileThemeDark||'sombre'));
+  }
   // Connect button text
   const ct=document.getElementById('connectText');
   if(ct&&!document.getElementById('connectBtn').classList.contains('logged-in'))ct.textContent=L.navLogin;
@@ -2302,6 +2568,9 @@ function applyTranslations(){
     regName:L.authName,regEmail:L.authRegEmail,regPass:L.authRegPass,
     regPhone:L.authPhone,regAddress:L.authAddress};
   Object.entries(pmap).forEach(([id,ph])=>{const el=document.getElementById(id);if(el)el.placeholder=' '+ph;});
+  // Auth buttons & links
+  const lbtn=document.querySelector('#loginForm .auth-submit');if(lbtn)lbtn.textContent=L.authLoginBtn;
+  const rbtn=document.querySelector('#registerForm .auth-submit');if(rbtn)rbtn.textContent=L.authRegBtn;
   // Track page
   const tTitle=document.querySelector('#page-track .track-title');if(tTitle)tTitle.textContent=L.trackTitle;
   const tSub=document.querySelector('#page-track .track-sub');if(tSub)tSub.textContent=L.trackSub;
@@ -2309,8 +2578,18 @@ function applyTranslations(){
   const tGo=document.querySelector('.track-go');if(tGo)tGo.textContent=L.trackBtn;
   // Cart page title
   const cTitle=document.querySelector('#page-cart .cart-title');if(cTitle)cTitle.textContent=L.cartTitle;
-  // Cart summary
-  setSafeText('.sum-lbl:nth-of-type(1)',L.cartSubtotal);
+  // Cart summary rows
+  const sumRows=document.querySelectorAll('#page-cart .sum-lbl');
+  if(sumRows[0])sumRows[0].textContent=L.cartSubtotal;
+  if(sumRows[1])sumRows[1].textContent=L.cartDelivery;
+  if(sumRows[2])sumRows[2].textContent=L.cartTVA;
+  // Cart free delivery
+  const freeEl=document.querySelector('#page-cart .sum-row:nth-child(2) span:last-child');
+  if(freeEl&&freeEl.style.color)freeEl.textContent=L.cartFree;
+  // Loyalty preview label
+  const lpLabel=document.querySelector('.loyalty-preview span:first-child');if(lpLabel)lpLabel.textContent='🎁 '+L.cartPoints;
+  // Cart safe payment note
+  const payNote=document.querySelector('.pay-note');if(payNote)payNote.textContent=L.cartSafe;
   const promoIn=document.getElementById('promoIn');if(promoIn)promoIn.placeholder=L.cartPromo;
   const promoGo=document.querySelector('.promo-go');if(promoGo)promoGo.textContent=L.cartApply;
   // Checkout btn
@@ -2319,6 +2598,125 @@ function applyTranslations(){
   const wTitle=document.querySelector('.wishlist-page h2');if(wTitle)wTitle.textContent=L.wishTitle;
   // Compare title
   const cpTitle=document.querySelector('.compare-title');if(cpTitle)cpTitle.textContent=L.compareTitle;
+  // Loyalty page
+  const loyTitle=document.querySelector('#page-loyalty h2');if(loyTitle)loyTitle.textContent=L.loyaltyTitle;
+  const loySubEl=document.querySelector('#page-loyalty p');if(loySubEl)loySubEl.textContent=L.loyaltySub;
+  // Orders page
+  const ordTitle=document.querySelector('#page-orders h2');if(ordTitle)ordTitle.textContent=L.ordersTitle;
+  // Payment modal header
+  const phTitle=document.querySelector('.pay-header-title');if(phTitle)phTitle.textContent=L.payTitle;
+  const psec=document.querySelector('.pay-secure');if(psec)psec.textContent=L.paySecure;
+  const prTitle=document.querySelector('.pay-recap-title');if(prTitle)prTitle.textContent=L.payRecap;
+  const ptLabel=document.querySelector('.pay-recap-total-label');if(ptLabel)ptLabel.textContent=L.payTotalTTC;
+  // Delivery section title
+  const dlTitle=document.querySelector('.delivery-title');if(dlTitle)dlTitle.textContent=L.payDelivery;
+  // Payment method label
+  const pmLabel=document.querySelector('[style*="Méthode"],[style*="payment method"],[style*="payment"]:not(.pay-method-btn)');
+  document.querySelectorAll('.pay-field .pay-label').forEach(lbl=>{
+    const input=lbl.nextElementSibling;if(!input)return;
+    const id=input.id;
+    const labelMap={'del-firstname':L.payFirst,'del-lastname':L.payLast,'del-phone':L.payPhone,
+      'del-address':L.payAddr,'del-wilaya':L.payWilaya,'del-postal':L.payPostal,
+      'card-num':L.payCardNum,'card-name':L.payCardName,'card-exp':L.payCardExp,'card-cvv':L.payCardCVV,
+      'dah-num':L.payDahNum,'dah-name':L.payCardName,'dah-exp':L.payCardExp,'dah-cvv':L.payCardCVV,
+      'ccp-num':L.payCCPMyNum};
+    if(labelMap[id])lbl.textContent=labelMap[id];
+  });
+  // Payment method buttons
+  const pmBtns=document.querySelectorAll('.pay-method-btn');
+  const pmLabels=[L.payCIBBtn,L.payDahBtn,L.payCCPBtn,L.payCODBtn];
+  const pmIcons=['💳','🟡','🟠','💵'];
+  pmBtns.forEach((btn,i)=>{if(pmLabels[i])btn.innerHTML=`<span class="pay-method-icon">${pmIcons[i]}</span>${pmLabels[i]}`;});
+  // Dahabia info
+  const dahInfo=document.querySelector('.dahabia-info div:last-child');if(dahInfo)dahInfo.textContent=L.payDahInfo;
+  const dahTitle=document.querySelector('.dahabia-title');if(dahTitle)dahTitle.textContent='💳 '+L.payDahBtn+' (CPA / BNA)';
+  // CCP panel
+  const ccpTitle=document.querySelector('.ccp-title');if(ccpTitle)ccpTitle.textContent='📮 '+L.payCCPTitle;
+  const ccpSteps=document.querySelectorAll('.ccp-step div:last-child');
+  const ccpStepTexts=[L.payCCPStep1,L.payCCPStep2,L.payCCPStep3];
+  ccpSteps.forEach((s,i)=>{if(ccpStepTexts[i])s.textContent=ccpStepTexts[i];});
+  // COD panel
+  const codTitle=document.querySelector('#panel-cod [style*="font-weight:700"]');if(codTitle)codTitle.textContent=L.payCOD;
+  const codDesc=document.querySelector('#panel-cod [style*="color:var(--muted)"]');if(codDesc)codDesc.textContent=L.payCODDesc;
+  // Search input
+  const searchIn=document.getElementById('searchIn');if(searchIn)searchIn.placeholder=L.searchPlaceholder;
+  // Sort select
+  const sortSel=document.getElementById('sortSel');
+  if(sortSel){
+    const opts=sortSel.options;
+    if(opts[0])opts[0].text=L.sortDefault;
+    if(opts[1])opts[1].text=L.sortPriceAsc;
+    if(opts[2])opts[2].text=L.sortPriceDesc;
+    if(opts[3])opts[3].text=L.sortName;
+    if(opts[4])opts[4].text=L.sortRating;
+  }
+  // Sidebar filter labels
+  setSafeText('.sb-card:nth-child(1) .sb-title',L.sbCat);
+  setSafeText('.sb-card:nth-child(2) .sb-title',L.sbPrice);
+  setSafeText('.sb-card:nth-child(3) .sb-title',L.sbAvail);
+  setSafeText('.sb-card:nth-child(4) .sb-title',L.sbRating);
+  const inStockLbl=document.querySelector('label[for="inStock"]');if(inStockLbl)inStockLbl.textContent=L.sbInStock;
+  const onSaleLbl=document.querySelector('label[for="onSale"]');if(onSaleLbl)onSaleLbl.textContent=L.sbOnSale;
+  const minP=document.getElementById('minP');if(minP)minP.placeholder=L.sbMin;
+  const maxP=document.getElementById('maxP');if(maxP)maxP.placeholder=L.sbMax;
+  // Rating select options
+  const minRating=document.getElementById('minRating');
+  if(minRating&&minRating.options[0])minRating.options[0].text=L.sbAllRatings;
+  // Home hero
+  const hEyebrow=document.querySelector('.hero-eyebrow');if(hEyebrow)hEyebrow.innerHTML=`<span style="content:''"></span>${L.heroEyebrow}`;
+  const h1=document.querySelector('.hero h1');
+  if(h1)h1.innerHTML=`${L.heroTitle}<br><em>${L.heroTitle2}</em>`;
+  const heroSub=document.querySelector('.hero-sub');if(heroSub)heroSub.textContent=L.heroSub;
+  const heroCta=document.querySelector('.btn-dark');if(heroCta)heroCta.textContent=L.heroCta;
+  const heroSec=document.querySelector('.btn-outline.hero-ctas .btn-outline');
+  document.querySelectorAll('.hero-ctas .btn').forEach((b,i)=>{if(i===0)b.textContent=L.heroCta;else b.textContent=L.heroSecondary;});
+  const panelLbl=document.querySelector('.panel-label');if(panelLbl)panelLbl.textContent=L.heroPanelLabel;
+  // Timer labels
+  const th=document.querySelector('#th')?.parentElement?.querySelector('.timer-lbl');
+  const tm=document.querySelector('#tm')?.parentElement?.querySelector('.timer-lbl');
+  const ts=document.querySelector('#ts')?.parentElement?.querySelector('.timer-lbl');
+  if(th)th.textContent=L.dealsH;
+  if(tm)tm.textContent=L.dealsM;
+  if(ts)ts.textContent=L.dealsS;
+  // Deals banner
+  const dealEyebrow=document.querySelector('.deals-eyebrow');if(dealEyebrow)dealEyebrow.textContent=L.dealsEyebrow;
+  const dealTitle=document.querySelector('.deals-title');if(dealTitle)dealTitle.textContent=L.dealsTitle;
+  const dealSub=document.querySelector('.deals-sub');if(dealSub)dealSub.textContent=L.dealsSub;
+  const dealBtn=document.querySelector('.deals-banner .btn');if(dealBtn)dealBtn.textContent=L.dealsViewBtn;
+  // Categories section title
+  const catsSec=document.querySelector('.section .section-head h2');if(catsSec)catsSec.textContent=L.catsTitle;
+  // Category cards (home grid)
+  const catCards=document.querySelectorAll('.cats-grid .cat-card');
+  const catNames=[L.catScreens,L.catCPU,L.catPeripheral,L.catGPU,L.catStorage,L.catRAM,L.catNetwork,L.catCase];
+  catCards.forEach((c,i)=>{const n=c.querySelector('.cat-name');if(n&&catNames[i])n.textContent=catNames[i];});
+  // Cat filter labels in sidebar
+  const sbLabels=document.querySelectorAll('.sb-card:nth-child(1) .filt-opt label');
+  const sbCatNames=['','Écrans','Processeurs','Périphériques','GPU','Stockage','RAM'];
+  // Price drop notif
+  const pdnTitleEl=document.querySelector('.pdn-title');if(pdnTitleEl)pdnTitleEl.textContent=L.pdnTitle;
+  // Review modal
+  const rvTitle=document.querySelector('#reviewModal .modal-title');if(rvTitle)rvTitle.textContent=L.reviewModalTitle;
+  const rvLabels=document.querySelectorAll('#reviewModal .form-label');
+  if(rvLabels[0])rvLabels[0].textContent=L.reviewYourRating;
+  if(rvLabels[1])rvLabels[1].textContent=L.reviewYourName;
+  if(rvLabels[2])rvLabels[2].textContent=L.reviewYourText;
+  const rvTxt=document.getElementById('reviewText');if(rvTxt)rvTxt.placeholder=L.reviewTextPlaceholder;
+  const rvSubmit=document.querySelector('#reviewModal .btn-teal');if(rvSubmit)rvSubmit.textContent=L.reviewSubmit;
+  const rvCancel=document.querySelector('#reviewModal .btn-outline');if(rvCancel)rvCancel.textContent=L.reviewCancel;
+  // Question modal
+  const qTitle=document.querySelector('#questionModal .modal-title');if(qTitle)qTitle.textContent=L.qModalTitle;
+  const qSub=document.querySelector('#questionModal .modal-sub');if(qSub)qSub.textContent=L.qModalSub;
+  const qLabels=document.querySelectorAll('#questionModal .form-label');
+  if(qLabels[0])qLabels[0].textContent=L.qModalName;
+  if(qLabels[1])qLabels[1].textContent=L.qModalText;
+  const qTxt=document.getElementById('questionText');if(qTxt)qTxt.placeholder=L.qModalTextPh;
+  const qSend=document.querySelector('#questionModal .btn-teal');if(qSend)qSend.textContent=L.qModalSend;
+  const qCancel=document.querySelector('#questionModal .btn-outline');if(qCancel)qCancel.textContent=L.qModalCancel;
+  // Success modal
+  const sucTitle=document.querySelector('#successModal .modal-title');if(sucTitle)sucTitle.textContent=L.successTitle;
+  // Compare bar
+  const cbCompBtn=document.querySelector('.cb-compare-btn');if(cbCompBtn)cbCompBtn.textContent=L.cbCompareBtn;
+  const cbClear=document.querySelector('.cb-clear');if(cbClear)cbClear.textContent=L.cbClearBtn;
   // Tutorial steps (update if tutorial uses TUT_STEPS)
   updateTutorialSteps(currentLang);
   // Re-render product cards if already rendered
@@ -2381,6 +2779,18 @@ function updateTutorialSteps(lang){
 // Init language on page load
 (function initLang(){
   const saved = localStorage.getItem('ds-lang')||'fr';
+  const flags={fr:'🇫🇷',en:'🇬🇧',ar:'🇩🇿'};
+  const labels={fr:'FR',en:'EN',ar:'ع'};
+  window.addEventListener('DOMContentLoaded',function(){
+    const flagEl=document.getElementById('langFlag');
+    const labelEl=document.getElementById('langLabel');
+    if(flagEl) flagEl.textContent=flags[saved]||'🇫🇷';
+    if(labelEl) labelEl.textContent=labels[saved]||'FR';
+    ['fr','en','ar'].forEach(l=>{
+      const b=document.getElementById('lang'+l.toUpperCase());
+      if(b) b.classList.toggle('active', l===saved);
+    });
+  });
   setLang(saved);
 })();
 </script>
