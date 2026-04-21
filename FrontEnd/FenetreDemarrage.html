@@ -7,351 +7,236 @@
     <link rel="stylesheet" href="sombre.css">
     <script src="sombre.js"></script>
     <style>
+/* ===== PALETTE PRINCIPALE ===== */
+:root {
+    --primary:       #024052;   /* Bleu pétrole profond  */
+    --primary-light: #035870;   /* Variante claire       */
+    --primary-soft:  #d0e8ef;   /* Teinte très pâle      */
+    --accent:        #56615f;   /* Gris ardoise          */
+    --accent-light:  #7a8785;   /* Gris clair            */
+    --accent-soft:   #eaeded;   /* Fond gris léger       */
+    --white:         #ffffff;
+    --text-dark:     #0d1f26;
+    --text-muted:    #5c6b70;
+    --border:        #c4d4d9;
+}
 
-        /* ===== Reset & Base ===== */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        
-        body {
-            background: linear-gradient(135deg, #e0faf2 0%, #b2f0e0 50%, #a7ffeb 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-            color: #111110;
-        }
-                /* Style du Hub Modal */
-.tm-hub-modal { width: 450px !important; border: 2px solid #497b89; }
+/* ===== Reset & Base ===== */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+body {
+    background: linear-gradient(135deg, #d6eaf0 0%, #b8d9e4 50%, #d0e8ef 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: var(--text-dark);
+}
+
+/* ===== Animations ===== */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50%       { transform: translateY(-20px) rotate(2deg); }
+}
+@keyframes pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50%       { opacity: 0.8; transform: scale(1.1); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Background Circles ===== */
+.bg-animated { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.bg-circle   { position: absolute; border-radius: 50%; filter: blur(60px); animation: pulse 6s ease-in-out infinite; }
+.bg-circle-1 { top: 5%;  left: 5%;  width: 300px; height: 300px; background: rgba(2, 64, 82, 0.12);  animation: pulse 5s infinite; }
+.bg-circle-2 { bottom: 10%; right: 5%; width: 400px; height: 400px; background: rgba(86, 97, 95, 0.12); animation: pulse 7s infinite reverse; }
+.bg-circle-3 { top: 40%; left: 45%; width: 250px; height: 250px; background: rgba(2, 64, 82, 0.07);  animation: pulse 8s infinite 1s; }
+
+/* ===== Utility ===== */
+.hidden      { display: none !important; }
+.text-center { text-align: center; }
+.highlight   { color: var(--primary); }
+
+/* ===== Container ===== */
+.container { position: relative; z-index: 10; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+/* ===== Logo ===== */
+.logo-section  { animation: fadeIn 0.8s ease-out; margin-bottom: 50px; }
+.logo-wrapper  { display: inline-block; position: relative; margin-bottom: 20px; animation: float 4s ease-in-out infinite; }
+.logo-img      { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--white); box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative; z-index: 2; }
+.logo-glow     { position: absolute; inset: -10px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; filter: blur(30px); opacity: 0.4; }
+
+.main-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; }
+.subtitle   { font-size: 1.4rem; color: var(--primary); font-weight: 600; margin-bottom: 10px; }
+.description { color: var(--text-muted); max-width: 700px; margin: 0 auto; line-height: 1.6; }
+
+/* ===== Features ===== */
+.why-section   { margin: 60px 0; }
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
+.feature-card  {
+    background: rgba(255,255,255,0.75); backdrop-filter: blur(10px);
+    padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(2,64,82,0.08);
+    border: 1px solid rgba(2,64,82,0.1);
+    transition: 0.3s; animation: float 5s ease-in-out infinite;
+}
+.feature-card:nth-child(2) { animation-delay: 0.5s; }
+.feature-card:nth-child(3) { animation-delay: 1s; }
+.feature-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(2,64,82,0.15); }
+.feature-icon  { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+.feature-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+
+/* ===== Option Cards ===== */
+.options-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; margin: 50px 0; }
+.option-card  {
+    flex: 1 1 300px; max-width: 380px; background: rgba(255,255,255,0.92);
+    padding: 35px; border-radius: 24px; box-shadow: 0 15px 35px rgba(2,64,82,0.1);
+    cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid transparent; text-align: left;
+}
+.option-card:hover { transform: scale(1.05); border-color: var(--primary); }
+.option-card.primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: var(--white); }
+
+.option-icon-box {
+    width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 15px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; margin-bottom: 20px; transition: 0.3s;
+}
+.option-card.primary .option-icon-box { background: rgba(255,255,255,0.2); }
+.option-card:hover .option-icon-box    { transform: rotate(10deg); }
+
+.option-card h3    { font-size: 1.6rem; margin-bottom: 10px; }
+.option-card p     { margin-bottom: 20px; opacity: 0.9; line-height: 1.5; }
+.option-link       { font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--primary); }
+.option-card.primary .option-link { color: var(--white); }
+
+/* ===== Tutorial Section ===== */
+.tutorial-section {
+    background: var(--white);
+    padding: 50px; border-radius: 30px;
+    box-shadow: 0 20px 40px rgba(2,64,82,0.1);
+    margin-top: 50px;
+    border: 1px solid var(--border);
+}
+.steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-top: 30px; }
+.step       { display: flex; gap: 15px; }
+.step-num   {
+    width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: var(--white); border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-weight: 800; flex-shrink: 0;
+}
+.step h4 { margin-bottom: 8px; font-weight: 700; color: var(--primary); }
+.step p  { font-size: 0.9rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ===== Tip Box ===== */
+.tip-box {
+    margin-top: 40px; padding: 25px; border-radius: 20px;
+    background: linear-gradient(90deg, rgba(2,64,82,0.05), rgba(86,97,95,0.08));
+    border-left: 5px solid var(--primary); display: flex; gap: 20px; align-items: center;
+}
+.promo-code { font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 2px 8px; border-radius: 5px; }
+
+/* ===== Forms ===== */
+.form-view {
+    max-width: 450px; margin: 40px auto;
+    background: var(--white); padding: 45px; border-radius: 30px;
+    box-shadow: 0 30px 60px rgba(2,64,82,0.15); animation: fadeIn 0.5s;
+    border: 1px solid var(--border);
+}
+.back-btn        { cursor: pointer; color: var(--primary); font-weight: 700; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 8px; }
+.back-btn:hover  { color: var(--accent); }
+
+input           { width: 100%; padding: 14px 20px; margin-bottom: 18px; border: 2px solid #e8eff2; border-radius: 15px; outline: none; transition: 0.3s; font-size: 1rem; }
+input:focus     { border-color: var(--primary); background: #f7fbfd; box-shadow: 0 0 0 3px rgba(2,64,82,0.08); }
+.btn-submit     { width: 100%; padding: 16px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: var(--white); font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+.btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(2,64,82,0.3); }
+
+/* ===== Dark Mode Toggle ===== */
+.dark-btn {
+    position: fixed; top: 20px; right: 20px;
+    width: 55px; height: 55px;
+    border: none; border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: var(--white); font-size: 1.5rem; cursor: pointer;
+    box-shadow: 0 8px 20px rgba(2,64,82,0.3); z-index: 1000;
+    transition: all 0.3s ease;
+}
+.dark-btn:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 12px 25px rgba(2,64,82,0.4); }
+body.dark-mode .dark-btn { background: linear-gradient(135deg, #111, #333); }
+
+/* ===== Hub Modal ===== */
+.tm-hub-modal { width: 450px !important; border: 2px solid var(--primary); }
 
 .tm-hub-grid { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
 
-/* Le "Bouton" Card */
 .tm-hub-card {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 18px;
-  background: #ffffff;
-  border: 2px solid #e2e2df;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+    display: flex; align-items: center; gap: 15px; padding: 18px;
+    background: var(--white); border: 2px solid var(--border);
+    border-radius: 20px; cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative; overflow: hidden;
 }
-
-/* Effet de survol (clairement cliquable) */
 .tm-hub-card:hover {
-  border-color: #497b89;
-  background: #f0f7f9;
-  transform: scale(1.02);
-  box-shadow: 0 10px 25px rgba(73, 123, 137, 0.15);
+    border-color: var(--primary); background: var(--accent-soft);
+    transform: scale(1.02); box-shadow: 0 10px 25px rgba(2,64,82,0.15);
 }
-
-/* L'icône des 3 lignes (Menu) */
 .tm-hub-menu-icon {
-  font-size: 18px;
-  color: #497b89;
-  background: #eef2f3;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
-  flex-shrink: 0;
+    font-size: 18px; color: var(--primary); background: var(--primary-soft);
+    width: 40px; height: 40px; display: flex; align-items: center;
+    justify-content: center; border-radius: 12px; flex-shrink: 0;
 }
-
 .tm-hub-info { flex: 1; }
-
-.tm-hub-name {
-  font-weight: 800;
-  color: #111;
-  font-size: 16px;
-  margin-bottom: 2px;
-}
-
-
-
-
-.tm-hub-text {
-  font-size: 12px;
-  color: #7a7a76;
-}
-
-/* La flèche à droite */
-.tm-hub-arrow {
-  font-size: 20px;
-  color: #497b89;
-  opacity: 0.5;
-  transition: transform 0.3s ease;
-}
-
-.tm-hub-card:hover .tm-hub-arrow {
-  opacity: 1;
-  transform: translateX(5px);
-}
-
-/* Petit badge de couleur sur le côté pour le style */
+.tm-hub-name { font-weight: 800; color: var(--text-dark); font-size: 16px; margin-bottom: 2px; }
+.tm-hub-text { font-size: 12px; color: var(--text-muted); }
+.tm-hub-arrow { font-size: 20px; color: var(--primary); opacity: 0.5; transition: transform 0.3s ease; }
+.tm-hub-card:hover .tm-hub-arrow { opacity: 1; transform: translateX(5px); }
 .tm-hub-card::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 6px;
-  background: #497b89;
-  opacity: 0;
-  transition: opacity 0.3s;
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 6px; background: var(--primary); opacity: 0; transition: opacity 0.3s;
 }
+.tm-hub-card:hover::before { opacity: 1; }
 
-.tm-hub-card:hover::before {
-  opacity: 1;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════
-   STYLE DU BOUTON MAÎTRE "Waw"
-═══════════════════════════════════════════════════════════════ */
-
+/* ===== Bouton Principal Tutoriels ===== */
 .tm-main-button {
-  /* Positionnement et dimensions */
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  
-  /* Couleurs et fond */
-  background: linear-gradient(135deg, #497b89, #5d9ba9);
-  color: #ffffff;
-  
-  /* Bordures et coins */
-  border: none;
-  border-radius: 99px; /* Forme pilule parfaite */
-  
-  /* Typographie */
-  font-family: 'Syne', sans-serif; /* Utilise la police Syne pour le titre */
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  text-transform: uppercase; /* Tout en majuscules pour le style */
-  
-  /* Interaction */
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* Ombre douce */
-  box-shadow: 0 6px 16px rgba(73, 123, 137, 0.25);
-  
-  /* Empêche la sélection du texte */
-  user-select: none;
-  -webkit-user-select: none;
+    display: inline-flex; align-items: center; gap: 12px; padding: 12px 24px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: var(--white); border: none; border-radius: 99px;
+    font-size: 15px; font-weight: 800; letter-spacing: -0.3px; text-transform: uppercase;
+    cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 6px 16px rgba(2,64,82,0.3); user-select: none;
 }
-
-/* L'Emoji ✨ */
-.tm-btn-emoji {
-  font-size: 18px;
-  /* Animation de pétillement */
-  animation: tmEmojiSparkle 3s ease-in-out infinite;
-}
-
-/* Le Texte */
-.tm-btn-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* La petite flèche ▾ */
-.tm-btn-arrow {
-  font-size: 12px;
-  opacity: 0.7;
-  transition: transform 0.3s ease;
-}
-
-/* ════════════════════════════════
-   EFFETS INTERACTIFS (HOVER)
-════════════════════════════════ */
-
-.tm-main-button:hover {
-  /* Change légèrement la couleur */
-  background: linear-gradient(135deg, #5d9ba9, #497b89);
-  
-  /* Se soulève un peu */
-  transform: translateY(-3px);
-  
-  /* L'ombre devient plus forte */
-  box-shadow: 0 10px 25px rgba(73, 123, 137, 0.35);
-}
-
-/* Quand on clique (Active) */
-.tm-main-button:active {
-  transform: translateY(-1px);
-  box-shadow: 0 5px 15px rgba(73, 123, 137, 0.3);
-}
-
-/* Quand le Hub est ouvert, on peut faire tourner la flèche */
-#tm-hub-overlay.open ~ .tm-main-button .tm-btn-arrow {
-  transform: rotate(180deg);
-}
-
-/* ════════════════════════════════
-   ANIMATION DE L'EMOJI
-════════════════════════════════ */
+.tm-btn-emoji { font-size: 18px; animation: tmEmojiSparkle 3s ease-in-out infinite; }
+.tm-btn-text  { display: flex; align-items: center; gap: 6px; }
+.tm-btn-arrow { font-size: 12px; opacity: 0.7; transition: transform 0.3s ease; }
+.tm-main-button:hover { background: linear-gradient(135deg, var(--primary-light), var(--primary)); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(2,64,82,0.4); }
+.tm-main-button:active { transform: translateY(-1px); box-shadow: 0 5px 15px rgba(2,64,82,0.3); }
 
 @keyframes tmEmojiSparkle {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.2) rotate(15deg);
-    opacity: 0.8;
-  }
+    0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    50%       { transform: scale(1.2) rotate(15deg); opacity: 0.8; }
 }
 
-
-        /* ===== Animations ===== */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(2deg); }
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.4; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.1); }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== Background Elements (Les Boules qui bougent) ===== */
-        .bg-animated { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
-        .bg-circle { position: absolute; border-radius: 50%; filter: blur(60px); animation: pulse 6s ease-in-out infinite; }
-        .bg-circle-1 { top: 5%; left: 5%; width: 300px; height: 300px; background: rgba(73, 123, 137, 0.15); animation: pulse 5s infinite; }
-        .bg-circle-2 { bottom: 10%; right: 5%; width: 400px; height: 400px; background: rgba(34, 197, 94, 0.15); animation: pulse 7s infinite reverse; }
-        .bg-circle-3 { top: 40%; left: 45%; width: 250px; height: 250px; background: rgba(73, 123, 137, 0.08); animation: pulse 8s infinite 1s; }
-
-        /* ===== Utility ===== */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .highlight { color: #3a6475; }
-
-        /* ===== Main Container ===== */
-        .container { position: relative; z-index: 10; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-
-        /* ===== Header & Logo ===== */
-        .logo-section { animation: fadeIn 0.8s ease-out; margin-bottom: 50px; }
-        .logo-wrapper { display: inline-block; position: relative; margin-bottom: 20px; animation: float 4s ease-in-out infinite; }
-        .logo-img { width: 160px; height: 160px; border-radius: 50%; border: 4px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.2); position: relative; z-index: 2; }
-        .logo-glow { position: absolute; inset: -10px; background: linear-gradient(135deg, #497b89, #22c55e); border-radius: 50%; filter: blur(30px); opacity: 0.4; }
-        
-        .main-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 10px; }
-        .subtitle { font-size: 1.4rem; color: #497b89; font-weight: 600; margin-bottom: 10px; }
-        .description { color: #7a7a76; max-width: 700px; margin: 0 auto; line-height: 1.6; }
-
-        /* ===== Features (Pourquoi choisir) ===== */
-        .why-section { margin: 60px 0; }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-top: 30px; }
-        .feature-card { 
-            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); 
-            padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            transition: 0.3s; animation: float 5s ease-in-out infinite;
-        }
-        .feature-card:nth-child(2) { animation-delay: 0.5s; }
-        .feature-card:nth-child(3) { animation-delay: 1s; }
-        .feature-icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
-        .feature-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
-
-        /* ===== Option Cards (Les 3 choix) ===== */
-        .options-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; margin: 50px 0; }
-        .option-card { 
-            flex: 1 1 300px; max-width: 380px; background: rgba(255, 255, 255, 0.9); 
-            padding: 35px; border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            cursor: pointer; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 2px solid transparent; text-align: left;
-        }
-        .option-card:hover { transform: scale(1.05); border-color: #22c55e; }
-        .option-card.primary { background: linear-gradient(135deg, #497b89, #22c55e); color: white; }
-        
-        .option-icon-box { 
-            width: 60px; height: 60px; background: linear-gradient(135deg, #497b89, #22c55e); 
-            border-radius: 15px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; margin-bottom: 20px; transition: 0.3s;
-        }
-        .option-card.primary .option-icon-box { background: rgba(255,255,255,0.2); }
-        .option-card:hover .option-icon-box { transform: rotate(10deg); }
-        
-        .option-card h3 { font-size: 1.6rem; margin-bottom: 10px; }
-        .option-card p { margin-bottom: 20px; opacity: 0.9; line-height: 1.5; }
-        .option-link { font-weight: 700; display: flex; align-items: center; gap: 10px; color: #497b89; }
-        .option-card.primary .option-link { color: white; }
-
-        /* ===== Tutorial Section ===== */
-        .tutorial-section { background: white; padding: 50px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); margin-top: 50px; }
-        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; margin-top: 30px; }
-        .step { display: flex; gap: 15px; }
-        .step-num { 
-            width: 40px; height: 40px; background: linear-gradient(135deg, #497b89, #22c55e); 
-            color: white; border-radius: 50%; display: flex; align-items: center; 
-            justify-content: center; font-weight: 800; flex-shrink: 0;
-        }
-        .step h4 { margin-bottom: 8px; font-weight: 700; }
-        .step p { font-size: 0.9rem; color: #666; line-height: 1.5; }
-
-        /* ===== Tip Box (Astuce) ===== */
-        .tip-box { 
-            margin-top: 40px; padding: 25px; border-radius: 20px; 
-            background: linear-gradient(90deg, rgba(73, 123, 137, 0.05), rgba(34, 197, 94, 0.1));
-            border-left: 5px solid #22c55e; display: flex; gap: 20px; align-items: center;
-        }
-        .promo-code { font-weight: 800; color: #22c55e; background: white; padding: 2px 8px; border-radius: 5px; }
-
-        /* ===== Forms (Login / Register) ===== */
-        .form-view { max-width: 450px; margin: 40px auto; background: white; padding: 45px; border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.2); animation: fadeIn 0.5s; }
-        .back-btn { cursor: pointer; color: #497b89; font-weight: 700; margin-bottom: 25px; display: inline-flex; align-items: center; gap: 8px; }
-        .back-btn:hover { color: #22c55e; }
-        
-        input { width: 100%; padding: 14px 20px; margin-bottom: 18px; border: 2px solid #f0f0f0; border-radius: 15px; outline: none; transition: 0.3s; font-size: 1rem; }
-        input:focus { border-color: #22c55e; background: #fafafa; }
-        .btn-submit { width: 100%; padding: 16px; border: none; border-radius: 15px; background: linear-gradient(135deg, #497b89, #22c55e); color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3); }
-
-        @media (max-width: 768px) {
-            .main-title { font-size: 2.5rem; }
-            .tutorial-section { padding: 30px 20px; }
-        }
- 
-.dark-btn {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    
-    width: 55px;
-    height: 55px;
-    
-    border: none;
-    border-radius: 50%;
-    
-    background: linear-gradient(135deg, #497b89, #22c55e);
-    color: white;
-    
-    font-size: 1.5rem;
-    cursor: pointer;
-    
-    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    
-    z-index: 1000;
-    
-    transition: all 0.3s ease;
+/* ===== Dark Mode ===== */
+body.dark-mode {
+    background: linear-gradient(135deg, #0a1a20 0%, #0d2530 50%, #0a1e28 100%);
+    color: #e0edf0;
 }
+body.dark-mode .feature-card,
+body.dark-mode .option-card { background: rgba(2,64,82,0.25); border-color: rgba(2,64,82,0.4); color: #e0edf0; }
+body.dark-mode .option-card.primary { background: linear-gradient(135deg, var(--primary), var(--primary-light)); }
+body.dark-mode .tutorial-section { background: #0d2530; border-color: rgba(2,64,82,0.5); color: #e0edf0; }
+body.dark-mode .tip-box { background: rgba(2,64,82,0.2); }
+body.dark-mode .form-view { background: #0d2530; border-color: rgba(2,64,82,0.5); color: #e0edf0; }
+body.dark-mode input { background: #0a1e28; border-color: rgba(2,64,82,0.5); color: #e0edf0; }
+body.dark-mode input:focus { border-color: var(--primary-light); background: #0d2c3d; }
+body.dark-mode .tm-hub-card { background: #0d2530; border-color: rgba(2,64,82,0.4); }
+body.dark-mode .tm-hub-card:hover { background: #0a1e28; }
+body.dark-mode .tm-hub-name { color: #e0edf0; }
 
-/* Hover effect */
-.dark-btn:hover {
-    transform: scale(1.1) rotate(10deg);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.3);
-}
-
-/* Dark mode version */
-body.dark-mode .dark-btn {
-    background: linear-gradient(135deg, #111, #333);
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .main-title       { font-size: 2.5rem; }
+    .tutorial-section { padding: 30px 20px; }
+    .tm-hub-modal     { width: 95vw !important; }
 }
     </style>
 </head>
