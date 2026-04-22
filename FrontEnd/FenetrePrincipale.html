@@ -157,7 +157,6 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--teal-mid); border-radius: 99px; opacity: .4; }
 
 /* ════ NAV ════ */
-<<<<<<< HEAD
 nav {
   position: sticky; top: 0; z-index: 200;
   background: rgba(240, 244, 245, 0.96);
@@ -216,29 +215,6 @@ nav {
 .lang-item .li-flag { font-size: 15px; }
 
 .nav-right { display: flex; align-items: center; gap: 6px; margin-left: auto; flex-shrink: 0; }
-=======
-nav{position:sticky;top:0;z-index:200; background: var(--teal-light);;backdrop-filter:blur(20px);border-bottom:1px solid rgba(73,123,137,.2);padding:0 24px;display:flex;align-items:center;gap:6px;height:var(--nav-h);box-shadow:0 2px 12px rgba(73,123,137,.08);transition:background .3s}
-.logo{display:flex;align-items:center;gap:8px;cursor:pointer;margin-right:10px;flex-shrink:0}
-.logo-img{height:34px;border-radius:6px}
-.logo-text{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px}
-.logo-text .digital{color:var(--text)}.logo-text .store{color:var(--teal)}
-.nav-links{display:flex;gap:2px;flex:1;overflow:hidden}
-.nav-link{padding:6px 11px;border-radius:var(--rs);font-size:13px;font-weight:500;color:var(--teal);cursor:pointer;border:none;background:transparent;transition:all var(--t);white-space:nowrap;font-family:inherit}
-.nav-link:hover,.nav-link.active{color:#fff;background:var(--teal)}
-.lang-switcher{position:relative;flex-shrink:0}
-.lang-dropdown-btn{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:var(--rs);background:var(--surface2);border:1px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;color:var(--text);font-family:inherit;transition:all var(--t);white-space:nowrap}
-.lang-dropdown-btn:hover{border-color:var(--teal);background:var(--teal-light);color:var(--teal)}
-.lang-dropdown-btn .lang-flag{font-size:14px}
-.lang-dropdown-btn .lang-arrow{font-size:9px;color:var(--muted);transition:transform .2s}
-.lang-dropdown-btn.open .lang-arrow{transform:rotate(180deg)}
-.lang-menu{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh-lg);overflow:hidden;z-index:500;min-width:130px}
-.lang-menu.open{display:block;animation:fadeIn .15s ease}
-.lang-item{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);transition:background var(--t);border:none;background:transparent;width:100%;font-family:inherit;text-align:left}
-.lang-item:hover{background:var(--teal-light);color:var(--teal)}
-.lang-item.active{background:var(--teal);color:#fff}
-.lang-item .li-flag{font-size:15px}
-.nav-right{display:flex;align-items:center;gap:6px;margin-left:auto;flex-shrink:0}
->>>>>>> e17bed863dd836740e902555b823f7e06058165c
 
 /* Dark toggle */
 .dark-toggle {
@@ -1129,10 +1105,7 @@ h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-
   <button class="nav-link" id="mnl-orders" onclick="nav('orders');closeMobileNav()">Commandes</button>
   <button class="nav-link" id="mnl-loyalty" onclick="nav('loyalty');closeMobileNav()">Fidélité</button>
   <button class="nav-link" id="mnl-track" onclick="nav('track');closeMobileNav()">Suivi</button>
-<<<<<<< HEAD
   <button class="nav-link" id="mnl-profile" onclick="openProfilePage();closeMobileNav()" style="display:none">👤 Mon Profil</button>
-=======
->>>>>>> e17bed863dd836740e902555b823f7e06058165c
   <button class="nav-link" id="mnl-guide" onclick="startTutorial();closeMobileNav()">Guide</button>
   <button class="nav-link" onclick="toggleDarkMode();closeMobileNav()" id="mobileThemeBtn">◑ Mode sombre</button>
 </div>
