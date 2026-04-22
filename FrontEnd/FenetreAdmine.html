@@ -13,7 +13,7 @@
   --bg:#f5f5f2; --surface:#fff; --surface2:#eeeeeb; --border:#e2e2df;
   --text:#111110; --muted:#7a7a76;
   --teal:#497b89; --teal-light:#a7ffeb; --teal-dark:#3a6475;
-  --green:#15803d; --green-light:#f0fdf4;
+  --green:#4b5563; --green-light:#f3f4f6;
   --red:#dc2626; --red-light:#fef2f2;
   --orange:#c2410c; --orange-light:#fff7ed;
   --blue:#1d4ed8; --blue-light:#eff6ff;
@@ -30,7 +30,7 @@
   --bg:#0f1923; --surface:#1a2535; --surface2:#1e2d3d; --border:#2a3d50;
   --text:#e8f4f8; --muted:#8aa8b8;
   --teal:#5ba3b8; --teal-light:#1a4a5a; --teal-dark:#4a8fa8;
-  --green:#717b74; --green-light:#0a2e1a;
+  --green:#6b7280; --green-light:#1f2937;
   --red:#f87171; --red-light:#2e0f0f;
   --orange:#fb923c; --orange-light:#2e1500;
   --blue:#60a5fa; --blue-light:#0f1e3d;
@@ -51,7 +51,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 [dir="rtl"] .td-actions { flex-direction:row-reverse; }
 
 /* ── LOGIN ── */
-#loginScreen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#e0faf2 0%,#b2f0e0 50%,#a7ffeb 100%);display:flex;align-items:center;justify-content:center}
+#loginScreen{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#e8edf0 0%,#d0dde4 50%,#c8d8e0 100%);display:flex;align-items:center;justify-content:center}
 [data-theme="dark"] #loginScreen{background:linear-gradient(135deg,#0d2535 0%,#0a1f2e 50%,#0f2840 100%)}
 .login-card{background:rgba(255,255,255,0.95);border-radius:24px;padding:44px 40px;width:420px;max-width:95vw;box-shadow:0 32px 80px rgba(73,123,137,.2);animation:slideUp .35s ease}
 [data-theme="dark"] .login-card{background:rgba(26,37,53,0.98);border:1px solid var(--border)}
@@ -100,7 +100,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .topbar-pill{display:flex;align-items:center;gap:6px;background:rgba(73,123,137,.12);color:var(--teal);padding:6px 12px;border-radius:99px;font-size:12px;font-weight:700}
 .topbar-btn{padding:7px 13px;border-radius:var(--rs);border:1px solid var(--border);background:transparent;color:var(--text);font-size:12px;font-weight:600;cursor:pointer;transition:all var(--t);font-family:inherit;display:flex;align-items:center;gap:5px}
 .topbar-btn:hover{background:var(--bg);border-color:var(--teal);color:var(--teal)}
-.guide-btn{background:linear-gradient(135deg,var(--teal),#22c55e)!important;color:#fff!important;border-color:transparent!important;box-shadow:0 2px 10px rgba(73,123,137,.35);animation:guidePulse 2.5s ease-in-out infinite}
+.guide-btn{background:linear-gradient(135deg,var(--teal),var(--teal-dark))!important;color:#fff!important;border-color:transparent!important;box-shadow:0 2px 10px rgba(73,123,137,.35);animation:guidePulse 2.5s ease-in-out infinite}
 .guide-btn:hover{transform:translateY(-1px);box-shadow:0 4px 18px rgba(73,123,137,.5)!important}
 @keyframes guidePulse{0%,100%{box-shadow:0 2px 10px rgba(73,123,137,.35)}50%{box-shadow:0 2px 20px rgba(73,123,137,.65)}}
 
@@ -147,7 +147,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:17px 18px;transition:background var(--t),border-color var(--t)}
 .stat-icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:11px}
 .si-teal{background:rgba(167,255,235,.25);color:var(--teal)}
-.si-green{background:var(--green-light);color:var(--green)}
+.si-green{background:var(--surface2);color:var(--muted)}
 .si-orange{background:var(--orange-light);color:var(--orange)}
 .si-red{background:var(--red-light);color:var(--red)}
 .si-blue{background:var(--blue-light);color:var(--blue)}
@@ -169,8 +169,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-sm{padding:5px 11px;font-size:12px;border-radius:6px}
 .btn-danger{background:var(--red-light);color:var(--red);border:1px solid rgba(220,38,38,.2)}
 .btn-danger:hover{background:var(--red);color:#fff}
-.btn-green{background:var(--green-light);color:var(--green);border:1px solid rgba(21,128,61,.2)}
-.btn-green:hover{background:var(--green);color:#fff}
+.btn-green{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-green:hover{background:var(--border);color:var(--text)}
 .btn-blue{background:var(--blue-light);color:var(--blue);border:1px solid rgba(29,78,216,.2)}
 
 /* ── TABLE ── */
@@ -184,7 +184,7 @@ tr:hover td{background:rgba(73,123,137,.04)}
 
 /* ── BADGES ── */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:11px;font-weight:700}
-.badge-green{background:var(--green-light);color:var(--green)}
+.badge-green{background:var(--surface2);color:var(--text)}
 .badge-red{background:var(--red-light);color:var(--red)}
 .badge-orange{background:var(--orange-light);color:var(--orange)}
 .badge-blue{background:var(--blue-light);color:var(--blue)}
@@ -206,7 +206,7 @@ tr:hover td{background:rgba(73,123,137,.04)}
 
 /* ── PROGRESS ── */
 .progress{height:6px;background:var(--border);border-radius:99px;overflow:hidden}
-.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),#22c55e);transition:width .6s ease}
+.progress-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--teal),var(--teal-dark));transition:width .6s ease}
 
 /* ── CHART ── */
 .chart-bars{display:flex;align-items:flex-end;gap:8px;height:100px;padding-bottom:22px;position:relative}
@@ -231,13 +231,14 @@ tr:hover td{background:rgba(73,123,137,.04)}
 .ts-done .ts-lbl{color:var(--text)}
 
 /* ── POINTS ── */
-.pts-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,var(--teal),#22c55e);color:#fff;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700}
+.pts-badge{display:inline-flex;align-items:center;gap:5px;background:var(--teal);color:#fff;border-radius:99px;padding:3px 10px;font-size:12px;font-weight:700}
 .pts-level{font-size:10px;font-weight:800;padding:2px 8px;border-radius:99px;text-transform:uppercase;letter-spacing:.5px}
 .lv-bronze{background:#fde68a;color:#92400e}
 .lv-silver{background:#f1f5f9;color:#475569}
-.lv-gold{background:#fef3c7;color:#b45309}
-.lv-platinum{background:linear-gradient(135deg,#e0e7ff,#f0fdf4);color:#3730a3}
+.lv-gold{background:#f3f4f6;color:#374151}
+.lv-platinum{background:linear-gradient(135deg,#e0e7ff,#e8eaf6);color:#3730a3}
 [data-theme="dark"] .lv-silver{background:#2a3a4a;color:#8aa8b8}
+[data-theme="dark"] .lv-gold{background:#2a3a4a;color:#8aa8b8}
 
 /* ── RECO MODULE ── */
 .reco-module{display:flex;align-items:center;justify-content:space-between;padding:12px 15px;background:var(--bg);border-radius:var(--rs);border:1px solid var(--border);margin-bottom:8px;gap:12px;transition:background var(--t)}
@@ -294,7 +295,7 @@ tr:hover td{background:rgba(73,123,137,.04)}
       <input class="login-input" type="password" id="adminPass" value="admin123">
     </div>
     <button class="login-submit" onclick="doLogin()" data-i="loginBtn">Accéder au tableau de bord →</button>
-    <p class="login-hint" data-i="loginHint">Identifiants démo : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="18797c757176587c717f716c79746b6c776a7d367c62">[email&#160;protected]</a> / admin123</p>
+    <p class="login-hint" data-i="loginHint">Identifiants démo : admin@digitalstore.dz / admin123</p>
   </div>
 </div>
 
@@ -336,18 +337,14 @@ tr:hover td{background:rgba(73,123,137,.04)}
     <div class="topbar">
       <div class="topbar-title" id="topbarTitle">Tableau de bord</div>
       <div class="topbar-right">
-        <div class="topbar-pill"><i class="fas fa-circle" style="font-size:7px;color:#22c55e"></i> <span data-i="connected">Connecté</span></div>
-        <!-- Language selector -->
+        <div class="topbar-pill"><i class="fas fa-circle" style="font-size:7px;color:var(--teal)"></i> <span data-i="connected">Connecté</span></div>
         <select class="lang-sel" onchange="setLang(this.value)" id="langSel">
           <option value="fr">🇫🇷 Français</option>
           <option value="en">🇬🇧 English</option>
           <option value="ar">🇩🇿 العربية</option>
         </select>
-        <!-- Dark mode -->
         <button class="dark-btn" onclick="toggleDark()" id="darkBtn" title="Mode sombre">🌙</button>
-        <!-- Sync -->
         <button class="topbar-btn" onclick="syncFromStore()"><i class="fas fa-sync-alt"></i> <span data-i="sync">Sync</span></button>
-        <!-- Guide -->
         <button class="topbar-btn guide-btn" onclick="startTour()" id="guideTourBtn" title="Guide interactif">
           <i class="fas fa-compass"></i> <span>Guide</span>
         </button>
@@ -508,9 +505,9 @@ tr:hover td{background:rgba(73,123,137,.04)}
         </div>
       </div>
 
-    </div><!-- /content -->
-  </div><!-- /main -->
-</div><!-- /appShell -->
+    </div>
+  </div>
+</div>
 
 <!-- ══════════ MODALS ══════════ -->
 
@@ -641,7 +638,7 @@ tr:hover td{background:rgba(73,123,137,.04)}
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ═══════════════════════════════════════
    TRANSLATIONS
 ═══════════════════════════════════════ */
@@ -679,7 +676,6 @@ const TRANSLATIONS = {
     assignPointsTitle:'Attribuer des points', client:'Client', pointsToAdd:'Points à ajouter', reason:'Motif',
     criteriaName:'Nom du critère', type:'Type', priority:'Priorité (1-5)',
     darkMode:'Mode sombre', lightMode:'Mode clair',
-    // Table headers
     thName:'Nom', thCategory:'Catégorie', thPrice:'Prix', thRating:'Note', thBadge:'Badge', thActions:'Actions',
     thIcon:'Icône', thDescription:'Description', thProducts:'Produits',
     thID:'ID', thClient:'Client', thItems:'Produits', thTotal:'Total', thDate:'Date', thStatus:'Statut', thEdit:'Modifier',
@@ -688,7 +684,6 @@ const TRANSLATIONS = {
     thProduct:'Produit', thComment:'Commentaire',
     thCriteria:'Critère', thType:'Type', thPriority:'Priorité', thActive:'Actif',
     thHistory:'Historique', thTrending:'Tendances', thPromoAlerts:'Alertes promo', thActiveSugg:'Suggestions actives',
-    // Misc
     noReviewsPending:'Aucun avis en attente ✓', syncedMsg:'✓ Produits synchronisés depuis la boutique',
     noBoutiqueData:'ℹ️ Aucune donnée boutique — données démo chargées',
     deleted:'Supprimé', saved:'✓ Enregistré', statusUpdated:'Statut mis à jour',
@@ -820,20 +815,15 @@ function setLang(lang) {
   const isAr = lang === 'ar';
   document.documentElement.lang = lang;
   document.documentElement.dir = isAr ? 'rtl' : 'ltr';
-  // Update all data-i elements
   document.querySelectorAll('[data-i]').forEach(el => {
     const key = el.dataset.i;
     if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = t(key);
     else el.textContent = t(key);
   });
-  // Re-render current section to update dynamic content
   renderSection();
   localStorage.setItem('ds_lang', lang);
 }
 
-/* ═══════════════════════════════════════
-   DARK MODE
-═══════════════════════════════════════ */
 let isDark = false;
 function toggleDark() {
   isDark = !isDark;
@@ -848,9 +838,6 @@ function initTheme() {
   setLang(lang);
 }
 
-/* ═══════════════════════════════════════
-   AUTH
-═══════════════════════════════════════ */
 function doLogin() {
   const e = document.getElementById('adminEmail').value.trim();
   const p = document.getElementById('adminPass').value;
@@ -866,9 +853,6 @@ function doLogin() {
 document.getElementById('adminPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
 function doLogout() { document.getElementById('appShell').style.display='none'; document.getElementById('loginScreen').style.display='flex'; }
 
-/* ═══════════════════════════════════════
-   DATA
-═══════════════════════════════════════ */
 const DP = [
   {id:0,name:'ASUS ProArt Display 4K',cat:'Écrans',price:749900,oldPrice:849900,rating:4.8,ratingCount:142,badge:'new',stock:true,img:'',specs:'32" IPS 4K · 60Hz · HDR600 · USB-C 96W',desc:'',specItems:{},reviews:[],imgs:[]},
   {id:1,name:'Samsung Odyssey G7',cat:'Écrans',price:489900,oldPrice:null,rating:4.6,ratingCount:89,badge:null,stock:true,img:'',specs:'27" VA Curved 1440p · 240Hz · G-Sync',desc:'',specItems:{},reviews:[],imgs:[]},
@@ -942,26 +926,20 @@ function syncFromStore() {
   toast(t('noBoutiqueData'));
 }
 
-/* ═══════════════════════════════════════
-   UTILS
-═══════════════════════════════════════ */
 function toast(msg) { const el=document.getElementById('atoast'); el.textContent=msg; el.classList.add('show'); clearTimeout(window._toast); window._toast=setTimeout(()=>el.classList.remove('show'),2800); }
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
-function avatarColor(n) { const c=['#497b89','#3a6475','#15803d','#1d4ed8','#c2410c','#7c3aed','#b45309']; let h=0; for(const ch of(n||'?')) h=(h+ch.charCodeAt(0))%c.length; return c[h]; }
+function avatarColor(n) { const c=['#497b89','#3a6475','#4b5563','#1d4ed8','#c2410c','#7c3aed','#b45309']; let h=0; for(const ch of(n||'?')) h=(h+ch.charCodeAt(0))%c.length; return c[h]; }
 function initials(f,l) { return ((f||'?')[0]+(l||'?')[0]).toUpperCase(); }
 function levelOf(pts) { return pts>=2000?'Platine':pts>=1000?'Or':pts>=400?'Argent':'Bronze'; }
 function levelClass(lv) { return {Bronze:'lv-bronze',Argent:'lv-silver',Or:'lv-gold',Platine:'lv-platinum'}[lv]||'lv-bronze'; }
 function statusBadge(st) {
-  const m={Livré:'badge-green','En cours':'badge-orange',Expédié:'badge-blue',Annulé:'badge-red',Approuvé:'badge-green','En attente':'badge-yellow',Rejeté:'badge-red',Actif:'badge-green',Inactif:'badge-gray'};
+  const m={Livré:'badge-teal','En cours':'badge-orange',Expédié:'badge-blue',Annulé:'badge-red',Approuvé:'badge-teal','En attente':'badge-yellow',Rejeté:'badge-red',Actif:'badge-teal',Inactif:'badge-gray'};
   return `<span class="badge ${m[st]||'badge-gray'}">${st}</span>`;
 }
 function stars(n) { let s=''; for(let i=1;i<=5;i++) s+=`<span style="color:${i<=n?'#f59e0b':'var(--border)'}">★</span>`; return s; }
 
-/* ═══════════════════════════════════════
-   NAVIGATION
-═══════════════════════════════════════ */
 let currentSection='dashboard';
 function showSection(id,el) {
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
@@ -984,22 +962,18 @@ function updateBadges() {
   document.getElementById('sbReviews').textContent=reviews.filter(r=>r.status==='En attente').length;
 }
 
-/* ═══════════════════════════════════════
-   DASHBOARD
-═══════════════════════════════════════ */
 function renderDashboard() {
   const pending=reviews.filter(r=>r.status==='En attente').length;
   const delivered=orders.filter(o=>o.status==='Livré').length;
   const avgRating=(products.reduce((s,p)=>s+(p.rating||0),0)/Math.max(products.length,1)).toFixed(1);
   document.getElementById('dashStats').innerHTML=`
     <div class="stat-card"><div class="stat-icon si-teal"><i class="fas fa-boxes"></i></div><div class="stat-val">${products.length}</div><div class="stat-lbl">${t('productCatalog')}</div></div>
-    <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-shopping-cart"></i></div><div class="stat-val">${orders.length}</div><div class="stat-lbl">${t('navOrders')}</div></div>
-    <div class="stat-card"><div class="stat-icon si-blue"><i class="fas fa-users"></i></div><div class="stat-val">${users.length}</div><div class="stat-lbl">${t('navUsers')}</div></div>
+    <div class="stat-card"><div class="stat-icon si-blue"><i class="fas fa-shopping-cart"></i></div><div class="stat-val">${orders.length}</div><div class="stat-lbl">${t('navOrders')}</div></div>
+    <div class="stat-card"><div class="stat-icon si-teal"><i class="fas fa-users"></i></div><div class="stat-val">${users.length}</div><div class="stat-lbl">${t('navUsers')}</div></div>
     <div class="stat-card"><div class="stat-icon si-orange"><i class="fas fa-comment-alt"></i></div><div class="stat-val">${pending}</div><div class="stat-lbl">${t('pendingReviews')}</div></div>
-    <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-check-circle"></i></div><div class="stat-val">${delivered}</div><div class="stat-lbl">${t('delivered')}</div></div>
+    <div class="stat-card"><div class="stat-icon si-teal"><i class="fas fa-check-circle"></i></div><div class="stat-val">${delivered}</div><div class="stat-lbl">${t('delivered')}</div></div>
     <div class="stat-card"><div class="stat-icon si-yellow"><i class="fas fa-star"></i></div><div class="stat-val">${avgRating}</div><div class="stat-lbl">${t('rating')}</div></div>
   `;
-  // Bar chart
   const months=['Jan','Fév','Mar','Avr','Mai','Juin'];
   const vals=[42000,68000,55000,91000,73000,85000];
   const max=Math.max(...vals);
@@ -1025,7 +999,7 @@ function renderDashboard() {
       <div>${stars(r.rating)}</div>
       <div style="flex:1"><strong>${r.client}</strong> — <span style="color:var(--muted)">${r.product}</span><div style="font-size:12.5px;color:var(--muted);margin-top:2px">${r.text}</div></div>
       <div style="display:flex;gap:5px;flex-shrink:0">
-        <button class="btn btn-green btn-sm" onclick="approveReview(${ri},true)">${t('approve')}</button>
+        <button class="btn btn-teal btn-sm" onclick="approveReview(${ri},true)">${t('approve')}</button>
         <button class="btn btn-danger btn-sm" onclick="approveReview(${ri},false)">${t('reject')}</button>
       </div>
     </div>`;
@@ -1035,7 +1009,7 @@ function drawDonut() {
   const canvas=document.getElementById('donutCanvas'); if(!canvas) return;
   const ctx=canvas.getContext('2d');
   const cats=[...new Set(products.map(p=>p.cat))];
-  const colors=['#497b89','#22c55e','#f59e0b','#e05a8a','#3b82f6','#8b5cf6'];
+  const colors=['#497b89','#6b7280','#9ca3af','#e05a8a','#3b82f6','#8b5cf6'];
   let start=-Math.PI/2;
   ctx.clearRect(0,0,90,90);
   cats.forEach((cat,i)=>{
@@ -1049,9 +1023,6 @@ function drawDonut() {
     <div class="donut-legend-item"><div class="donut-dot" style="background:${colors[i%colors.length]}"></div><span>${cat} (${products.filter(p=>p.cat===cat).length})</span></div>`).join('');
 }
 
-/* ═══════════════════════════════════════
-   PRODUCTS  ← Bug fix: separate open/save functions, no redefined openModal
-═══════════════════════════════════════ */
 function renderProducts() {
   document.getElementById('prodTable').innerHTML=`
     <thead><tr><th>${t('thName')}</th><th>${t('thCategory')}</th><th>${t('thPrice')}</th><th>${t('thRating')}</th><th>${t('thBadge')}</th><th>${t('thActions')}</th></tr></thead>
@@ -1116,9 +1087,6 @@ function saveProd() {
 }
 function delProd(i) { if(!confirm(t('confirmDeleteProd'))) return; products.splice(i,1); saveData('ds_products',products); localStorage.setItem('articles',JSON.stringify(products)); renderProducts(); updateBadges(); toast(t('deleted')); }
 
-/* ═══════════════════════════════════════
-   CATEGORIES
-═══════════════════════════════════════ */
 function renderCategories() {
   document.getElementById('catTable').innerHTML=`
     <thead><tr><th>${t('thName')}</th><th>${t('thIcon')}</th><th>${t('thDescription')}</th><th>${t('thProducts')}</th><th>${t('thActions')}</th></tr></thead>
@@ -1137,9 +1105,6 @@ function openEditCat(i) { document.getElementById('catIdx').value=i; document.ge
 function saveCat() { const idx=parseInt(document.getElementById('catIdx').value); const item={name:document.getElementById('catName').value,icon:document.getElementById('catIcon').value,desc:document.getElementById('catDesc').value}; if(isNaN(idx)||idx<0) categories.push(item); else categories[idx]=item; saveData('ds_categories',categories); closeModal('catModal'); renderCategories(); toast(t('saved')); }
 function delCat(i) { if(!confirm(t('confirmDelete'))) return; categories.splice(i,1); saveData('ds_categories',categories); renderCategories(); toast(t('deleted')); }
 
-/* ═══════════════════════════════════════
-   ORDERS
-═══════════════════════════════════════ */
 function renderOrders() {
   const filt=document.getElementById('orderFilter').value;
   const list=filt?orders.filter(o=>o.status===filt):orders;
@@ -1161,9 +1126,6 @@ function renderOrders() {
 }
 function changeOrderStatus(i,val) { orders[i].status=val; saveData('ds_orders',orders); renderOrders(); toast(t('statusUpdated')); }
 
-/* ═══════════════════════════════════════
-   DELIVERY
-═══════════════════════════════════════ */
 function renderDelivery() {
   document.getElementById('deliveryList').innerHTML=deliveries.map((d,di)=>`
     <div style="border:1px solid var(--border);border-radius:var(--r);padding:17px;margin-bottom:13px">
@@ -1173,7 +1135,7 @@ function renderDelivery() {
           <div style="font-weight:700;font-size:15px;margin-top:2px">${d.client}</div>
           <div style="font-size:12px;color:var(--muted)">${d.addr}</div>
         </div>
-        ${d.step<d.steps.length-1?`<button class="btn btn-teal btn-sm" onclick="advanceDelivery(${di})"><i class="fas fa-arrow-right"></i> ${t('advanceStep')}</button>`:`<span class="badge badge-green">${t('delivered')}</span>`}
+        ${d.step<d.steps.length-1?`<button class="btn btn-teal btn-sm" onclick="advanceDelivery(${di})"><i class="fas fa-arrow-right"></i> ${t('advanceStep')}</button>`:`<span class="badge badge-teal">${t('delivered')}</span>`}
       </div>
       <div class="track-steps">${d.steps.map((s,si)=>{
         const cls=si<d.step?'ts-done':si===d.step?'ts-current':'';
@@ -1187,9 +1149,6 @@ function renderDelivery() {
 }
 function advanceDelivery(i) { if(deliveries[i].step<deliveries[i].steps.length-1){ deliveries[i].step++; saveData('ds_deliveries',deliveries); renderDelivery(); toast(t('stepAdvanced')); } }
 
-/* ═══════════════════════════════════════
-   POINTS
-═══════════════════════════════════════ */
 function renderPoints() {
   const lvls={Bronze:0,Argent:0,Or:0,Platine:0};
   users.forEach(u=>{ lvls[levelOf(u.pts||0)]++; });
@@ -1211,7 +1170,7 @@ function renderPoints() {
         <td><div style="display:flex;align-items:center;gap:9px"><div class="avatar" style="background:${avatarColor(u.first+u.last)}">${initials(u.first,u.last)}</div>${u.first} ${u.last}</div></td>
         <td><span class="pts-badge"><i class="fas fa-star" style="font-size:10px"></i> ${(u.pts||0).toLocaleString()}</span></td>
         <td><span class="pts-level ${levelClass(lv)}">${lv}</span></td>
-        <td>${rew>0?`<span class="badge badge-green">${rew} récompense${rew>1?'s':''}</span>`:`<span style="color:var(--muted);font-size:12px">—</span>`}</td>
+        <td>${rew>0?`<span class="badge badge-teal">${rew} récompense${rew>1?'s':''}</span>`:`<span style="color:var(--muted);font-size:12px">—</span>`}</td>
         <td><button class="btn btn-outline btn-sm" onclick="openAddPts(${i})"><i class="fas fa-plus"></i></button></td>
       </tr>`;
     }).join('')}</tbody>`;
@@ -1224,9 +1183,6 @@ function openAddPts(presel=-1) {
 }
 function savePts() { const idx=parseInt(document.getElementById('ptsUser').value); const amt=parseInt(document.getElementById('ptsAmt').value)||0; users[idx].pts=(users[idx].pts||0)+amt; saveData('ds_users',users); closeModal('ptsModal'); renderPoints(); toast(`${amt} ${t('ptsAssigned')} ${users[idx].first}`); }
 
-/* ═══════════════════════════════════════
-   USERS
-═══════════════════════════════════════ */
 function renderUsers() {
   document.getElementById('usersTable').innerHTML=`
     <thead><tr><th>${t('thClient')}</th><th>${t('thEmail')}</th><th>${t('thPhone')}</th><th>${t('thRole')}</th><th>${t('thStatus')}</th><th>${t('thPoints')}</th><th>${t('thActions')}</th></tr></thead>
@@ -1241,7 +1197,7 @@ function renderUsers() {
         <td><span class="pts-badge" style="font-size:11px"><i class="fas fa-star" style="font-size:9px"></i> ${(u.pts||0).toLocaleString()}</span></td>
         <td><div class="td-actions">
           <button class="btn btn-outline btn-sm" onclick="openEditUser(${i})"><i class="fas fa-edit"></i></button>
-          <button class="btn btn-sm ${u.active?'btn-danger':'btn-green'}" onclick="toggleUser(${i})">${u.active?'<i class="fas fa-ban"></i>':'<i class="fas fa-check"></i>'}</button>
+          <button class="btn btn-sm ${u.active?'btn-danger':'btn-outline'}" onclick="toggleUser(${i})">${u.active?'<i class="fas fa-ban"></i>':'<i class="fas fa-check"></i>'}</button>
           <button class="btn btn-danger btn-sm" onclick="delUser(${i})"><i class="fas fa-trash"></i></button>
         </div></td>
       </tr>`;
@@ -1259,9 +1215,6 @@ function saveUser() { const idx=parseInt(document.getElementById('userIdx').valu
 function toggleUser(i) { users[i].active=!users[i].active; saveData('ds_users',users); renderUsers(); toast(users[i].active?t('userActivated'):t('userDeactivated')); }
 function delUser(i) { if(!confirm(t('confirmDeleteUser'))) return; users.splice(i,1); saveData('ds_users',users); renderUsers(); updateBadges(); toast(t('deleted')); }
 
-/* ═══════════════════════════════════════
-   REVIEWS
-═══════════════════════════════════════ */
 function renderReviews() {
   const filt=document.getElementById('reviewFilter').value;
   const list=filt?reviews.filter(r=>r.status===filt):reviews;
@@ -1270,7 +1223,7 @@ function renderReviews() {
   const rej=reviews.filter(r=>r.status==='Rejeté').length;
   const avg=(reviews.reduce((s,r)=>s+(r.rating||0),0)/Math.max(reviews.length,1)).toFixed(1);
   document.getElementById('reviewStats').innerHTML=`
-    <div class="stat-card"><div class="stat-icon si-green"><i class="fas fa-check-circle"></i></div><div class="stat-val">${app}</div><div class="stat-lbl">${t('approved')}</div></div>
+    <div class="stat-card"><div class="stat-icon si-teal"><i class="fas fa-check-circle"></i></div><div class="stat-val">${app}</div><div class="stat-lbl">${t('approved')}</div></div>
     <div class="stat-card"><div class="stat-icon si-yellow"><i class="fas fa-clock"></i></div><div class="stat-val">${pend}</div><div class="stat-lbl">${t('pending')}</div></div>
     <div class="stat-card"><div class="stat-icon si-red"><i class="fas fa-times-circle"></i></div><div class="stat-val">${rej}</div><div class="stat-lbl">${t('rejected')}</div></div>
     <div class="stat-card"><div class="stat-icon si-teal"><i class="fas fa-star"></i></div><div class="stat-val">${avg}</div><div class="stat-lbl">${t('rating')}</div></div>`;
@@ -1285,7 +1238,7 @@ function renderReviews() {
         <td style="font-size:11.5px;color:var(--muted)">${r.date}</td>
         <td>${statusBadge(r.status)}</td>
         <td><div class="td-actions">
-          ${r.status==='En attente'?`<button class="btn btn-green btn-sm" onclick="approveReview(${ri},true)">${t('approve')}</button><button class="btn btn-danger btn-sm" onclick="approveReview(${ri},false)">${t('reject')}</button>`:''}
+          ${r.status==='En attente'?`<button class="btn btn-teal btn-sm" onclick="approveReview(${ri},true)">${t('approve')}</button><button class="btn btn-danger btn-sm" onclick="approveReview(${ri},false)">${t('reject')}</button>`:''}
           <button class="btn btn-danger btn-sm" onclick="delReview(${ri})"><i class="fas fa-trash"></i></button>
         </div></td>
       </tr>`;
@@ -1294,11 +1247,8 @@ function renderReviews() {
 function approveReview(i,ok) { reviews[i].status=ok?'Approuvé':'Rejeté'; saveData('ds_reviews',reviews); if(currentSection==='reviews') renderReviews(); renderDashboard(); updateBadges(); toast(ok?t('reviewApproved'):t('reviewRejected')); }
 function delReview(i) { if(!confirm(t('confirmDeleteReview'))) return; reviews.splice(i,1); saveData('ds_reviews',reviews); renderReviews(); updateBadges(); toast(t('deleted')); }
 
-/* ═══════════════════════════════════════
-   COMPARATOR
-═══════════════════════════════════════ */
 function renderComparator() {
-  const tc={Numérique:'badge-blue',Texte:'badge-teal',Booléen:'badge-green',Liste:'badge-orange'};
+  const tc={Numérique:'badge-blue',Texte:'badge-teal',Booléen:'badge-teal',Liste:'badge-orange'};
   document.getElementById('critTable').innerHTML=`
     <thead><tr><th>${t('thCriteria')}</th><th>${t('thType')}</th><th>${t('thPriority')}</th><th>${t('thActive')}</th><th>${t('thActions')}</th></tr></thead>
     <tbody>${criteria.map((c,i)=>`<tr>
@@ -1326,9 +1276,6 @@ function saveCrit() { const idx=parseInt(document.getElementById('critIdx').valu
 function toggleCrit(i) { criteria[i].active=!criteria[i].active; saveData('ds_criteria',criteria); toast(criteria[i].active?t('critEnabled'):t('critDisabled')); }
 function delCrit(i) { if(!confirm(t('confirmDelete'))) return; criteria.splice(i,1); saveData('ds_criteria',criteria); renderComparator(); toast(t('deleted')); }
 
-/* ═══════════════════════════════════════
-   RECOMMENDATIONS
-═══════════════════════════════════════ */
 function renderRecommendations() {
   document.getElementById('recoModules').innerHTML=recoModules.map((m,i)=>`
     <div class="reco-module">
@@ -1367,34 +1314,7 @@ function renderRecommendations() {
 }
 function toggleReco(i) { recoModules[i].active=!recoModules[i].active; saveData('ds_reco',recoModules); renderRecommendations(); toast(recoModules[i].active?t('moduleEnabled'):t('moduleDisabled')); }
 
-/* ═══════════════════════════════════════
-   INIT
-═════
-═══════════════════════════════════════ */
-function initApp() {
-  loadData();
-  renderSection();
-  applyLang(currentLang);
-  // Auto-fetch product images if missing
-  products.forEach((p, i) => {
-    if (!p.img) fetchProductImage(p, i);
-  });
-  // Show tour hint on first visit
-  if (!localStorage.getItem('ds_tour_done')) {
-    setTimeout(() => {
-      toast('💡 Cliquez sur « Guide » pour une visite guidée !');
-    }, 1800);
-  }
-}
-document.getElementById('appShell').style.display = 'none';
-
-/* ═══════════════════════════════════════
-   AUTO-FETCH PRODUCT IMAGES
-═══════════════════════════════════════ */
 function fetchProductImage(product, idx) {
-  // Build a relevant search query from product name
-  const query = encodeURIComponent(product.name + ' ' + product.cat + ' product');
-  // Use Unsplash Source as a free image proxy with relevant keywords
   const keywords = buildImageKeywords(product);
   const url = `https://source.unsplash.com/120x120/?${keywords}`;
   products[idx].img = url;
@@ -1403,7 +1323,6 @@ function fetchProductImage(product, idx) {
 function buildImageKeywords(p) {
   const name = p.name.toLowerCase();
   const cat  = (p.cat || '').toLowerCase();
-  // Map product types to better Unsplash keywords
   const map = [
     [/écran|monitor|display|odyssey|proart/i, 'computer+monitor+screen'],
     [/clavier|keyboard|keychron/i, 'mechanical+keyboard'],
@@ -1425,357 +1344,105 @@ function buildImageKeywords(p) {
 }
 
 /* ═══════════════════════════════════════
-   INTERACTIVE TOUR — MULTILINGUAL
+   INTERACTIVE TOUR
 ═══════════════════════════════════════ */
-
-// Tour UI labels per language
 const TOUR_I18N = {
-  fr: {
-    stepOf: (i, n) => `Étape ${i} / ${n}`,
-    prev: 'Précédent',
-    next: 'Suivant',
-    finish: '✓ Terminer',
-    quit: 'Quitter',
-    btnLabel: 'Guide',
-    hint: '💡 Cliquez sur « Guide » pour une visite guidée !',
-  },
-  en: {
-    stepOf: (i, n) => `Step ${i} / ${n}`,
-    prev: 'Previous',
-    next: 'Next',
-    finish: '✓ Finish',
-    quit: 'Exit',
-    btnLabel: 'Tutorial',
-    hint: '💡 Click "Tutorial" for an interactive tour!',
-  },
-  ar: {
-    stepOf: (i, n) => `الخطوة ${i} من ${n}`,
-    prev: 'السابق',
-    next: 'التالي',
-    finish: '✓ إنهاء',
-    quit: 'خروج',
-    btnLabel: 'دليل',
-    hint: '💡 انقر على "دليل" للجولة التفاعلية!',
-  },
+  fr: { stepOf:(i,n)=>`Étape ${i} / ${n}`, prev:'Précédent', next:'Suivant', finish:'✓ Terminer', quit:'Quitter', btnLabel:'Guide', hint:'💡 Cliquez sur « Guide » pour une visite guidée !' },
+  en: { stepOf:(i,n)=>`Step ${i} / ${n}`, prev:'Previous', next:'Next', finish:'✓ Finish', quit:'Exit', btnLabel:'Tutorial', hint:'💡 Click "Tutorial" for an interactive tour!' },
+  ar: { stepOf:(i,n)=>`الخطوة ${i} من ${n}`, prev:'السابق', next:'التالي', finish:'✓ إنهاء', quit:'خروج', btnLabel:'دليل', hint:'💡 انقر على "دليل" للجولة التفاعلية!' },
 };
 
-// All tour steps with FR / EN / AR translations
 const TOUR_STEPS_DATA = [
-  {
-    target: '#guideTourBtn',
-    arrow: 'top',
-    section: null,
-    fr: { title: '👋 Bienvenue dans le Guide !', desc: 'Ce tutoriel interactif va vous guider à travers toutes les fonctionnalités du panneau d\'administration DigitalStore. Cliquez Suivant pour commencer.' },
-    en: { title: '👋 Welcome to the Tutorial!', desc: 'This interactive tutorial will walk you through all features of the DigitalStore admin panel. Click Next to get started.' },
-    ar: { title: '👋 مرحباً بك في الدليل!', desc: 'سيرشدك هذا البرنامج التعليمي التفاعلي عبر جميع ميزات لوحة تحكم DigitalStore. انقر على التالي للبدء.' },
-  },
-  {
-    target: '.sb-item[onclick*="dashboard"]',
-    arrow: 'right',
-    section: 'dashboard',
-    sidebarEl: '.sb-item[onclick*="dashboard"]',
-    fr: { title: '📊 Tableau de bord', desc: 'Le tableau de bord affiche un résumé en temps réel : produits, commandes, utilisateurs, avis en attente, et les graphiques de ventes mensuelles par catégorie.' },
-    en: { title: '📊 Dashboard', desc: 'The dashboard shows a real-time summary: products, orders, users, pending reviews, and monthly sales charts broken down by category.' },
-    ar: { title: '📊 لوحة التحكم', desc: 'تعرض لوحة التحكم ملخصاً فورياً: المنتجات والطلبات والمستخدمين والتقييمات المعلقة ومخططات المبيعات الشهرية حسب الفئة.' },
-  },
-  {
-    target: '.sb-item[onclick*="products"]',
-    arrow: 'right',
-    section: 'products',
-    sidebarEl: '.sb-item[onclick*="products"]',
-    targetOverride: '.sb-item[onclick*="products"]',
-    fr: { title: '📦 Catalogue Produits', desc: 'Ajoutez, modifiez ou supprimez des produits. Renseignez l\'URL image, le nom, la catégorie, le prix et les specs. Les images sont chargées automatiquement depuis le web si aucune URL n\'est fournie.' },
-    en: { title: '📦 Product Catalog', desc: 'Add, edit or delete products. Fill in the image URL, name, category, price and specs. Images are auto-loaded from the web when no URL is provided.' },
-    ar: { title: '📦 كتالوج المنتجات', desc: 'أضف المنتجات أو عدّلها أو احذفها. أدخل رابط الصورة والاسم والفئة والسعر والمواصفات. يتم تحميل الصور تلقائياً من الويب إذا لم يتوفر رابط.' },
-  },
-  {
-    target: '.sb-item[onclick*="categories"]',
-    arrow: 'right',
-    section: 'categories',
-    sidebarEl: '.sb-item[onclick*="categories"]',
-    targetOverride: '.sb-item[onclick*="categories"]',
-    fr: { title: '🏷️ Catégories', desc: 'Gérez vos catégories (Écrans, GPU, RAM…). Chaque catégorie a un nom, une icône et une description. Elles apparaissent dans le filtre de la boutique côté client.' },
-    en: { title: '🏷️ Categories', desc: 'Manage your categories (Screens, GPU, RAM…). Each category has a name, icon and description. They appear in the store filter on the customer side.' },
-    ar: { title: '🏷️ الفئات', desc: 'أدر فئاتك (شاشات، GPU، ذاكرة RAM…). لكل فئة اسم وأيقونة ووصف. تظهر هذه الفئات في فلتر المتجر على الجانب الخاص بالعميل.' },
-  },
-  {
-    target: '.sb-item[onclick*="orders"]',
-    arrow: 'right',
-    section: 'orders',
-    sidebarEl: '.sb-item[onclick*="orders"]',
-    targetOverride: '.sb-item[onclick*="orders"]',
-    fr: { title: '🛒 Gestion des Commandes', desc: 'Visualisez toutes les commandes. Filtrez par statut : Livré, En cours, Expédié, Annulé. Chaque ligne affiche l\'ID, le client, les produits, le total et le statut.' },
-    en: { title: '🛒 Order Management', desc: 'View all orders and filter by status: Delivered, In Progress, Shipped, Cancelled. Each row shows the ID, client, items, total and status.' },
-    ar: { title: '🛒 إدارة الطلبات', desc: 'اعرض جميع الطلبات وصفّها حسب الحالة: تم التسليم، قيد المعالجة، تم الشحن، ملغى. تعرض كل سطر المعرف والعميل والمنتجات والمجموع والحالة.' },
-  },
-  {
-    target: '.sb-item[onclick*="delivery"]',
-    arrow: 'right',
-    section: 'delivery',
-    sidebarEl: '.sb-item[onclick*="delivery"]',
-    targetOverride: '.sb-item[onclick*="delivery"]',
-    fr: { title: '🚚 Suivi des Livraisons', desc: 'Suivez en temps réel l\'avancement de chaque livraison. Utilisez le bouton « Avancer » pour passer à l\'étape suivante : Préparé → Expédié → En route → Livré.' },
-    en: { title: '🚚 Delivery Tracking', desc: 'Track each delivery in real time. Use the "Advance" button to move to the next step: Prepared → Shipped → On the Way → Delivered.' },
-    ar: { title: '🚚 تتبع التوصيل', desc: 'تابع تقدم كل عملية توصيل في الوقت الفعلي. استخدم زر "تقدم" للانتقال للخطوة التالية: جاهز ← شُحن ← في الطريق ← تم التسليم.' },
-  },
-  {
-    target: '.sb-item[onclick*="points"]',
-    arrow: 'right',
-    section: 'points',
-    sidebarEl: '.sb-item[onclick*="points"]',
-    targetOverride: '.sb-item[onclick*="points"]',
-    fr: { title: '⭐ Points Fidélité', desc: 'Gérez le programme de fidélité. Attribuez des points via « Attribuer Points ». Les niveaux sont Bronze (0-399), Argent (400-999), Or (1000-1999), Platine (2000+).' },
-    en: { title: '⭐ Loyalty Points', desc: 'Manage the loyalty program. Assign points via "Assign Points". Levels are Bronze (0-399), Silver (400-999), Gold (1000-1999), Platinum (2000+).' },
-    ar: { title: '⭐ نقاط الولاء', desc: 'أدر برنامج الولاء. اضف نقاطاً عبر "تعيين النقاط". المستويات: برونزي (0-399)، فضي (400-999)، ذهبي (1000-1999)، بلاتيني (2000+).' },
-  },
-  {
-    target: '.sb-item[onclick*="users"]',
-    arrow: 'right',
-    section: 'users',
-    sidebarEl: '.sb-item[onclick*="users"]',
-    targetOverride: '.sb-item[onclick*="users"]',
-    fr: { title: '👥 Gestion des Utilisateurs', desc: 'Ajoutez ou modifiez des comptes (Clients, Admins, Livreurs). Activez ou désactivez des comptes. L\'historique des commandes par client est affiché en bas.' },
-    en: { title: '👥 User Management', desc: 'Add or edit accounts (Clients, Admins, Delivery). Enable or disable accounts. Order history per client is shown at the bottom.' },
-    ar: { title: '👥 إدارة المستخدمين', desc: 'أضف حسابات أو عدّلها (عملاء، مشرفون، موصّلون). فعّل الحسابات أو عطّلها. سجل الطلبات لكل عميل يظهر في الأسفل.' },
-  },
-  {
-    target: '.sb-item[onclick*="reviews"]',
-    arrow: 'right',
-    section: 'reviews',
-    sidebarEl: '.sb-item[onclick*="reviews"]',
-    targetOverride: '.sb-item[onclick*="reviews"]',
-    fr: { title: '💬 Avis Clients', desc: 'Modérez les avis avant publication. Les avis « En attente » sont prioritaires. Cliquez ✓ Approuver pour publier sur la boutique, ou ✕ Rejeter pour les masquer.' },
-    en: { title: '💬 Customer Reviews', desc: 'Moderate reviews before publishing. "Pending" reviews are prioritized. Click ✓ Approve to publish to the store, or ✕ Reject to hide them.' },
-    ar: { title: '💬 تقييمات العملاء', desc: 'راجع التقييمات قبل نشرها. تقييمات "قيد الانتظار" لها الأولوية. انقر ✓ موافقة للنشر في المتجر، أو ✕ رفض لإخفائها.' },
-  },
-  {
-    target: '.sb-item[onclick*="comparator"]',
-    arrow: 'right',
-    section: 'comparator',
-    sidebarEl: '.sb-item[onclick*="comparator"]',
-    targetOverride: '.sb-item[onclick*="comparator"]',
-    fr: { title: '⚖️ Comparateur de Produits', desc: 'Définissez les critères de comparaison (Prix, RAM, Marque…). Choisissez le type (Numérique, Texte, Booléen) et la priorité d\'affichage de 1 à 5.' },
-    en: { title: '⚖️ Product Comparator', desc: 'Define comparison criteria (Price, RAM, Brand…). Choose the type (Numeric, Text, Boolean) and display priority from 1 to 5.' },
-    ar: { title: '⚖️ مقارنة المنتجات', desc: 'حدد معايير المقارنة (السعر، الذاكرة، العلامة التجارية…). اختر النوع (رقمي، نص، منطقي) وأولوية العرض من 1 إلى 5.' },
-  },
-  {
-    target: '.sb-item[onclick*="recommendations"]',
-    arrow: 'right',
-    section: 'recommendations',
-    sidebarEl: '.sb-item[onclick*="recommendations"]',
-    targetOverride: '.sb-item[onclick*="recommendations"]',
-    fr: { title: '🤖 Recommandations IA', desc: 'Activez des modules intelligents : suggestions basées sur l\'historique, produits tendances, alertes promo. Personnalisez les suggestions pour chaque client.' },
-    en: { title: '🤖 AI Recommendations', desc: 'Enable smart modules: history-based suggestions, trending products, promo alerts. Personalize suggestions for each customer.' },
-    ar: { title: '🤖 التوصيات الذكية', desc: 'فعّل الوحدات الذكية: اقتراحات بناءً على السجل، المنتجات الرائجة، تنبيهات العروض. خصص الاقتراحات لكل عميل.' },
-  },
-  {
-    target: '#guideTourBtn',
-    arrow: 'top',
-    section: null,
-    isLast: true,
-    fr: { title: '🎉 Vous maîtrisez le panneau Admin !', desc: 'Vous connaissez maintenant toutes les fonctionnalités. Relancez ce guide à tout moment via le bouton Guide en haut à droite. Bonne gestion !' },
-    en: { title: '🎉 You mastered the Admin Panel!', desc: 'You now know all the features. Restart this tutorial anytime via the Tutorial button in the top right. Happy managing!' },
-    ar: { title: '🎉 أتقنت لوحة الإدارة!', desc: 'أنت تعرف الآن جميع الميزات. يمكنك إعادة تشغيل هذا الدليل في أي وقت عبر زر "دليل" في أعلى اليمين. إدارة موفقة!' },
-  },
+  { target:'#guideTourBtn', arrow:'top', section:null, fr:{title:'👋 Bienvenue dans le Guide !',desc:'Ce tutoriel interactif va vous guider à travers toutes les fonctionnalités du panneau d\'administration DigitalStore.'}, en:{title:'👋 Welcome to the Tutorial!',desc:'This interactive tutorial will walk you through all features of the DigitalStore admin panel.'}, ar:{title:'👋 مرحباً بك في الدليل!',desc:'سيرشدك هذا البرنامج التعليمي التفاعلي عبر جميع ميزات لوحة تحكم DigitalStore.'} },
+  { target:'.sb-item[onclick*="dashboard"]', arrow:'right', section:'dashboard', sidebarEl:'.sb-item[onclick*="dashboard"]', fr:{title:'📊 Tableau de bord',desc:'Résumé en temps réel : produits, commandes, utilisateurs, avis et graphiques de ventes.'}, en:{title:'📊 Dashboard',desc:'Real-time summary: products, orders, users, reviews and sales charts.'}, ar:{title:'📊 لوحة التحكم',desc:'ملخص فوري: المنتجات والطلبات والمستخدمين والتقييمات ومخططات المبيعات.'} },
+  { target:'.sb-item[onclick*="products"]', arrow:'right', section:'products', sidebarEl:'.sb-item[onclick*="products"]', targetOverride:'.sb-item[onclick*="products"]', fr:{title:'📦 Catalogue Produits',desc:'Ajoutez, modifiez ou supprimez des produits avec image, catégorie, prix et specs.'}, en:{title:'📦 Product Catalog',desc:'Add, edit or delete products with image, category, price and specs.'}, ar:{title:'📦 كتالوج المنتجات',desc:'أضف المنتجات أو عدّلها أو احذفها مع الصورة والفئة والسعر والمواصفات.'} },
+  { target:'.sb-item[onclick*="categories"]', arrow:'right', section:'categories', sidebarEl:'.sb-item[onclick*="categories"]', targetOverride:'.sb-item[onclick*="categories"]', fr:{title:'🏷️ Catégories',desc:'Gérez vos catégories avec nom, icône et description.'}, en:{title:'🏷️ Categories',desc:'Manage your categories with name, icon and description.'}, ar:{title:'🏷️ الفئات',desc:'أدر فئاتك بالاسم والأيقونة والوصف.'} },
+  { target:'.sb-item[onclick*="orders"]', arrow:'right', section:'orders', sidebarEl:'.sb-item[onclick*="orders"]', targetOverride:'.sb-item[onclick*="orders"]', fr:{title:'🛒 Commandes',desc:'Visualisez et filtrez toutes les commandes par statut.'}, en:{title:'🛒 Orders',desc:'View and filter all orders by status.'}, ar:{title:'🛒 الطلبات',desc:'اعرض وصفّ جميع الطلبات حسب الحالة.'} },
+  { target:'.sb-item[onclick*="delivery"]', arrow:'right', section:'delivery', sidebarEl:'.sb-item[onclick*="delivery"]', targetOverride:'.sb-item[onclick*="delivery"]', fr:{title:'🚚 Livraisons',desc:'Suivez en temps réel l\'avancement de chaque livraison étape par étape.'}, en:{title:'🚚 Deliveries',desc:'Track each delivery in real time step by step.'}, ar:{title:'🚚 التوصيل',desc:'تابع تقدم كل عملية توصيل في الوقت الفعلي خطوة بخطوة.'} },
+  { target:'.sb-item[onclick*="points"]', arrow:'right', section:'points', sidebarEl:'.sb-item[onclick*="points"]', targetOverride:'.sb-item[onclick*="points"]', fr:{title:'⭐ Points Fidélité',desc:'Gérez le programme de fidélité. Niveaux : Bronze, Argent, Or, Platine.'}, en:{title:'⭐ Loyalty Points',desc:'Manage the loyalty program. Levels: Bronze, Silver, Gold, Platinum.'}, ar:{title:'⭐ نقاط الولاء',desc:'أدر برنامج الولاء. المستويات: برونزي، فضي، ذهبي، بلاتيني.'} },
+  { target:'.sb-item[onclick*="users"]', arrow:'right', section:'users', sidebarEl:'.sb-item[onclick*="users"]', targetOverride:'.sb-item[onclick*="users"]', fr:{title:'👥 Utilisateurs',desc:'Gérez les comptes Clients, Admins et Livreurs.'}, en:{title:'👥 Users',desc:'Manage Client, Admin and Delivery accounts.'}, ar:{title:'👥 المستخدمون',desc:'أدر حسابات العملاء والمشرفين والموصّلين.'} },
+  { target:'.sb-item[onclick*="reviews"]', arrow:'right', section:'reviews', sidebarEl:'.sb-item[onclick*="reviews"]', targetOverride:'.sb-item[onclick*="reviews"]', fr:{title:'💬 Avis Clients',desc:'Modérez les avis avant publication. Approuvez ou rejetez.'}, en:{title:'💬 Reviews',desc:'Moderate reviews before publishing. Approve or reject.'}, ar:{title:'💬 التقييمات',desc:'راجع التقييمات قبل نشرها. وافق أو ارفض.'} },
+  { target:'.sb-item[onclick*="comparator"]', arrow:'right', section:'comparator', sidebarEl:'.sb-item[onclick*="comparator"]', targetOverride:'.sb-item[onclick*="comparator"]', fr:{title:'⚖️ Comparateur',desc:'Définissez les critères de comparaison produits (type, priorité).'}, en:{title:'⚖️ Comparator',desc:'Define product comparison criteria (type, priority).'}, ar:{title:'⚖️ المقارنة',desc:'حدد معايير مقارنة المنتجات (النوع، الأولوية).'} },
+  { target:'.sb-item[onclick*="recommendations"]', arrow:'right', section:'recommendations', sidebarEl:'.sb-item[onclick*="recommendations"]', targetOverride:'.sb-item[onclick*="recommendations"]', fr:{title:'🤖 Recommandations',desc:'Activez des modules intelligents de suggestions personnalisées.'}, en:{title:'🤖 Recommendations',desc:'Enable smart personalized suggestion modules.'}, ar:{title:'🤖 التوصيات',desc:'فعّل وحدات الاقتراحات الذكية المخصصة.'} },
+  { target:'#guideTourBtn', arrow:'top', section:null, isLast:true, fr:{title:'🎉 Vous maîtrisez le panneau Admin !',desc:'Vous connaissez toutes les fonctionnalités. Relancez ce guide à tout moment.'}, en:{title:'🎉 You mastered the Admin Panel!',desc:'You now know all the features. Restart this tutorial anytime.'}, ar:{title:'🎉 أتقنت لوحة الإدارة!',desc:'أنت تعرف الآن جميع الميزات. يمكنك إعادة تشغيل الدليل في أي وقت.'} },
 ];
 
-// Return steps in the current language
 function getTourSteps() {
-  const lang = currentLang || 'fr';
-  return TOUR_STEPS_DATA.map(s => ({
-    ...s,
-    title: (s[lang] || s.fr).title,
-    desc:  (s[lang] || s.fr).desc,
-  }));
+  const lang=currentLang||'fr';
+  return TOUR_STEPS_DATA.map(s=>({...s,title:(s[lang]||s.fr).title,desc:(s[lang]||s.fr).desc}));
 }
 
-let tourStep = 0;
-let tourActive = false;
-let prevHighlighted = null;
+let tourStep=0, tourActive=false, prevHighlighted=null;
 
 function startTour() {
-  tourStep = 0;
-  tourActive = true;
-  document.getElementById('tourBackdrop').style.display = 'block';
-  document.getElementById('tourBox').style.display = 'block';
-  // RTL support for Arabic
-  const box = document.getElementById('tourBox');
-  box.dir = (currentLang === 'ar') ? 'rtl' : 'ltr';
-  buildTourDots();
-  updateTourLabels();
-  showTourStep(tourStep);
+  tourStep=0; tourActive=true;
+  document.getElementById('tourBackdrop').style.display='block';
+  document.getElementById('tourBox').style.display='block';
+  const box=document.getElementById('tourBox');
+  box.dir=(currentLang==='ar')?'rtl':'ltr';
+  buildTourDots(); updateTourLabels(); showTourStep(tourStep);
 }
-
 function updateTourLabels() {
-  const lang = currentLang || 'fr';
-  const i18n = TOUR_I18N[lang] || TOUR_I18N.fr;
-  document.getElementById('tourSkipLabel').textContent = i18n.quit;
-  document.getElementById('tourPrevLabel').textContent = i18n.prev;
-  // update guide button label
-  const guideSpan = document.querySelector('#guideTourBtn span');
-  if (guideSpan) guideSpan.textContent = i18n.btnLabel;
+  const i18n=TOUR_I18N[currentLang]||TOUR_I18N.fr;
+  document.getElementById('tourSkipLabel').textContent=i18n.quit;
+  document.getElementById('tourPrevLabel').textContent=i18n.prev;
+  const gs=document.querySelector('#guideTourBtn span');
+  if(gs) gs.textContent=i18n.btnLabel;
 }
-
-// Call updateTourLabels when language changes (hook into setLang)
-const _origSetLang = window.setLang;
-window.setLang = function(lang) {
-  _origSetLang && _origSetLang(lang);
-  updateTourLabels();
-  // If tour is open, refresh step content in new language
-  if (tourActive) showTourStep(tourStep);
-};
-
-function skipTour() {
-  tourActive = false;
-  document.getElementById('tourBackdrop').style.display = 'none';
-  document.getElementById('tourBox').style.display = 'none';
-  clearHighlight();
-  localStorage.setItem('ds_tour_done', '1');
-}
-
-function buildTourDots() {
-  const d = document.getElementById('tourDots');
-  d.innerHTML = TOUR_STEPS_DATA.map((_, i) => `<div class="tour-dot" id="tdot${i}"></div>`).join('');
-}
-
+const _origSetLang=window.setLang;
+window.setLang=function(lang){ _origSetLang&&_origSetLang(lang); updateTourLabels(); if(tourActive) showTourStep(tourStep); };
+function skipTour() { tourActive=false; document.getElementById('tourBackdrop').style.display='none'; document.getElementById('tourBox').style.display='none'; clearHighlight(); localStorage.setItem('ds_tour_done','1'); }
+function buildTourDots() { document.getElementById('tourDots').innerHTML=TOUR_STEPS_DATA.map((_,i)=>`<div class="tour-dot" id="tdot${i}"></div>`).join(''); }
 function showTourStep(idx) {
-  const steps = getTourSteps();
-  const step = steps[idx];
-  if (!step) { skipTour(); return; }
-  const lang = currentLang || 'fr';
-  const i18n = TOUR_I18N[lang] || TOUR_I18N.fr;
-
-  // Navigate to section if needed
-  if (step.section) {
-    const targetEl = document.querySelector(step.sidebarEl);
-    if (targetEl) targetEl.click();
-  }
-
-  // Update content
-  document.getElementById('tourStepLabel').textContent = i18n.stepOf(idx + 1, steps.length);
-  document.getElementById('tourTitle').textContent = step.title;
-  document.getElementById('tourDesc').textContent = step.desc;
-  document.getElementById('tourSkipLabel').textContent = i18n.quit;
-
-  // Update dots
-  document.querySelectorAll('.tour-dot').forEach((d, i) => {
-    d.classList.toggle('active', i === idx);
-  });
-
-  // Prev button
-  const prevBtn = document.getElementById('tourPrev');
-  prevBtn.style.opacity = idx === 0 ? '0.3' : '1';
-  prevBtn.disabled = idx === 0;
-  document.getElementById('tourPrevLabel').textContent = i18n.prev;
-
-  // Next button
-  const nextBtn = document.getElementById('tourNext');
-  const nextLabel = document.getElementById('tourNextLabel');
-  if (step.isLast) {
-    nextLabel.textContent = i18n.finish;
-    nextBtn.querySelector('i').style.display = 'none';
-    nextBtn.onclick = skipTour;
-  } else {
-    nextLabel.textContent = i18n.next;
-    nextBtn.querySelector('i').style.display = '';
-    nextBtn.onclick = tourNext;
-  }
-
-  // Highlight target
+  const steps=getTourSteps(); const step=steps[idx]; if(!step){skipTour();return;}
+  const i18n=TOUR_I18N[currentLang]||TOUR_I18N.fr;
+  if(step.section){ const el=document.querySelector(step.sidebarEl); if(el) el.click(); }
+  document.getElementById('tourStepLabel').textContent=i18n.stepOf(idx+1,steps.length);
+  document.getElementById('tourTitle').textContent=step.title;
+  document.getElementById('tourDesc').textContent=step.desc;
+  document.getElementById('tourSkipLabel').textContent=i18n.quit;
+  document.querySelectorAll('.tour-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
+  const prevBtn=document.getElementById('tourPrev'); prevBtn.style.opacity=idx===0?'0.3':'1'; prevBtn.disabled=idx===0;
+  document.getElementById('tourPrevLabel').textContent=i18n.prev;
+  const nextBtn=document.getElementById('tourNext'); const nextLabel=document.getElementById('tourNextLabel');
+  if(step.isLast){ nextLabel.textContent=i18n.finish; nextBtn.querySelector('i').style.display='none'; nextBtn.onclick=skipTour; }
+  else { nextLabel.textContent=i18n.next; nextBtn.querySelector('i').style.display=''; nextBtn.onclick=tourNext; }
   clearHighlight();
-  const targetSel = step.targetOverride || step.target;
-  setTimeout(() => {
-    const el = document.querySelector(targetSel);
-    if (el) {
-      prevHighlighted = el;
-      el.classList.add('tour-highlight');
-      positionTourBox(el, step.arrow);
-    } else {
-      positionCenter();
-    }
-  }, step.section ? 350 : 50);
+  const targetSel=step.targetOverride||step.target;
+  setTimeout(()=>{ const el=document.querySelector(targetSel); if(el){ prevHighlighted=el; el.classList.add('tour-highlight'); positionTourBox(el,step.arrow); } else positionCenter(); }, step.section?350:50);
 }
-
-function positionTourBox(target, arrowDir) {
-  const box = document.getElementById('tourBox');
-  const r = target.getBoundingClientRect();
-  const bw = 320, bh = box.offsetHeight || 230;
-  let top, left;
-  const pad = 18;
-
-  box.className = box.className.replace(/arrow-\w+/g, '').trim();
-
-  if (arrowDir === 'right' || (r.left > bw + pad && arrowDir !== 'top')) {
-    left = r.right + pad;
-    top  = r.top + r.height / 2 - bh / 2;
-    box.classList.add('arrow-left');
-  } else if (arrowDir === 'left') {
-    left = r.left - bw - pad;
-    top  = r.top + r.height / 2 - bh / 2;
-    box.classList.add('arrow-right');
-  } else if (arrowDir === 'bottom' || r.top > bh + pad) {
-    left = r.left + r.width / 2 - bw / 2;
-    top  = r.top - bh - pad;
-    box.classList.add('arrow-bottom');
-  } else {
-    left = r.left + r.width / 2 - bw / 2;
-    top  = r.bottom + pad;
-    box.classList.add('arrow-top');
-  }
-
-  left = Math.max(12, Math.min(left, window.innerWidth - bw - 12));
-  top  = Math.max(12, Math.min(top,  window.innerHeight - bh - 12));
-
-  box.style.left = left + 'px';
-  box.style.top  = top  + 'px';
+function positionTourBox(target,arrowDir) {
+  const box=document.getElementById('tourBox'); const r=target.getBoundingClientRect();
+  const bw=320,bh=box.offsetHeight||230; let top,left; const pad=18;
+  box.className=box.className.replace(/arrow-\w+/g,'').trim();
+  if(arrowDir==='right'||(r.left>bw+pad&&arrowDir!=='top')){ left=r.right+pad; top=r.top+r.height/2-bh/2; box.classList.add('arrow-left'); }
+  else if(arrowDir==='left'){ left=r.left-bw-pad; top=r.top+r.height/2-bh/2; box.classList.add('arrow-right'); }
+  else if(arrowDir==='bottom'||r.top>bh+pad){ left=r.left+r.width/2-bw/2; top=r.top-bh-pad; box.classList.add('arrow-bottom'); }
+  else { left=r.left+r.width/2-bw/2; top=r.bottom+pad; box.classList.add('arrow-top'); }
+  left=Math.max(12,Math.min(left,window.innerWidth-bw-12));
+  top=Math.max(12,Math.min(top,window.innerHeight-bh-12));
+  box.style.left=left+'px'; box.style.top=top+'px';
 }
+function positionCenter() { const box=document.getElementById('tourBox'); box.className=box.className.replace(/arrow-\w+/g,'').trim(); box.style.left=(window.innerWidth/2-160)+'px'; box.style.top=(window.innerHeight/2-115)+'px'; }
+function clearHighlight() { document.querySelectorAll('.tour-highlight').forEach(el=>el.classList.remove('tour-highlight')); prevHighlighted=null; }
+function tourNext() { if(tourStep<TOUR_STEPS_DATA.length-1){ tourStep++; showTourStep(tourStep); } }
+function tourPrev() { if(tourStep>0){ tourStep--; showTourStep(tourStep); } }
 
-function positionCenter() {
-  const box = document.getElementById('tourBox');
-  box.className = box.className.replace(/arrow-\w+/g, '').trim();
-  box.style.left = (window.innerWidth  / 2 - 160) + 'px';
-  box.style.top  = (window.innerHeight / 2 - 115) + 'px';
-}
+function applyLang(lang) { setLang(lang); }
 
-function clearHighlight() {
-  document.querySelectorAll('.tour-highlight').forEach(el => el.classList.remove('tour-highlight'));
-  prevHighlighted = null;
-}
-
-function tourNext() {
-  if (tourStep < TOUR_STEPS_DATA.length - 1) {
-    tourStep++;
-    showTourStep(tourStep);
-  }
-}
-
-function tourPrev() {
-  if (tourStep > 0) {
-    tourStep--;
-    showTourStep(tourStep);
-  }
-}
-
-
-/* ═══════════════════════════════════════
-   INIT
-═══════════════════════════════════════ */
 function initApp() {
   loadData();
   renderSection();
   applyLang(currentLang);
-  products.forEach((p, i) => {
-    if (!p.img) fetchProductImage(p, i);
-  });
-  if (!localStorage.getItem('ds_tour_done')) {
-    const lang = currentLang || 'fr';
-    const i18n = TOUR_I18N[lang] || TOUR_I18N.fr;
-    setTimeout(() => toast(i18n.hint), 1800);
+  products.forEach((p,i)=>{ if(!p.img) fetchProductImage(p,i); });
+  if(!localStorage.getItem('ds_tour_done')) {
+    const i18n=TOUR_I18N[currentLang]||TOUR_I18N.fr;
+    setTimeout(()=>toast(i18n.hint),1800);
   }
   updateTourLabels();
 }
-document.getElementById('appShell').style.display = 'none';
-
+document.getElementById('appShell').style.display='none';
+initTheme();
 </script>
 </body>
 </html>
