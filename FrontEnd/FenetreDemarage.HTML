@@ -457,18 +457,56 @@ body.dark-mode .tm-hub-name { color: #e0edf0; }
         }
 
         // Actions Login / Register
-        function loginAction() {
-            const email = document.getElementById('lEmail').value;
-            if(email) alert('Connexion réussie pour ' + email);
-            else alert('Veuillez remplir les champs');
-        }
+        async function loginAction() {
+    const data = {
+        email: document.getElementById('lEmail').value,
+        password: document.getElementById('lPass').value
+    };
 
-        function registerAction() {
-            const name = document.getElementById('rName').value;
-            if(name) alert('Félicitations ' + name + ', votre compte est prêt !');
-            else alert('Veuillez remplir tous les champs');
-        }
+    const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
 
+    const result = await res.json();
+
+    if (result.success) {
+        alert("Connexion réussie");
+
+        // option: stocker user
+        localStorage.setItem("user", JSON.stringify(result.user));
+
+        window.location.href = "FenetrePrincipale.html";
+    } else {
+        alert(result.message);
+    }
+}
+
+        async function registerAction() {
+    const data = {
+        nom: document.getElementById('rName').value.split(" ")[0] || "",
+        prenom: document.getElementById('rName').value.split(" ")[1] || "",
+        email: document.getElementById('rEmail').value,
+        password: document.getElementById('rPass').value,
+        telephone: document.getElementById('rPhone').value
+    };
+
+    const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data) 
+    });
+
+    const result = await res.json();
+
+    if (result.success) {
+        alert("Compte créé !");
+        showView("loginForm");
+    } else {
+        alert(result.message);
+    }
+}
 
 
         const isDarkMode = localStorage.getItem('darkMode') === 'enabled';
