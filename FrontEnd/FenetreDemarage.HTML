@@ -474,7 +474,14 @@ body.dark-mode .tm-hub-name { color: #e0edf0; }
     if (result.success) {
         alert("Connexion réussie");
 
-        // option: stocker user
+        // Session partagée avec FenetrePrincipale
+        const displayName = [result.user.prenom, result.user.nom].filter(Boolean).join(' ').trim() || (data.email || '').split('@')[0] || 'Utilisateur';
+        localStorage.setItem("ds-auth-user", JSON.stringify({
+            id: result.user.id,
+            displayName: displayName,
+            email: data.email || ""
+        }));
+        // Compatibilité ancienne clé
         localStorage.setItem("user", JSON.stringify(result.user));
 
         window.location.href = "FenetrePrincipale.html";

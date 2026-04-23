@@ -1399,6 +1399,17 @@ h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-
 
     <!-- Bouton déconnexion standalone -->
     <div style="text-align:center;padding:24px 0 40px;">
+      <button onclick="switchAccountUser()" style="
+        display:inline-flex;align-items:center;gap:10px;margin-right:10px;
+        padding:13px 24px;border-radius:10px;
+        background:var(--surface);color:var(--text);
+        border:1.5px solid var(--border);
+        font-size:14px;font-weight:700;font-family:inherit;
+        cursor:pointer;transition:all .2s;
+      " onmouseover="this.style.borderColor='var(--teal)';this.style.color='var(--teal)';"
+         onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text)';">
+        ⇄ Se connecter avec un autre compte
+      </button>
       <button onclick="logoutUser()" style="
         display:inline-flex;align-items:center;gap:10px;
         padding:13px 32px;border-radius:10px;
@@ -1560,7 +1571,7 @@ const PRODUCTS_DATA=[
 /* ═══ STATE ═══ */
 let products=[...PRODUCTS_DATA],cart=[],wishlist=[],compareList=[];
 let currentProduct=null,currentQty=1,currentCatFilter='Tout',currentRating=0,promoApplied=false;
-let loggedInUser=null,currentPayMethod='cib';
+let loggedInUser=null,loggedInUserId=null,loggedInUserEmail='',currentPayMethod='cib';
 let orderHistory=[],loyaltyPoints=0,priceAlerts={},viewedProducts=[];
 
 /* ═══════════════════════════════════════════
@@ -1952,10 +1963,125 @@ document.addEventListener('DOMContentLoaded', function(){
   if(btn) btn.addEventListener('click', function(){
     if(loggedInUser){ openProfilePage(); } else { openAuthModal(); }
   });
+  restoreAuthSession();
 });
 
+function apiRequest(url, options){
+  return fetch(url, Object.assign({
+    headers: { 'Content-Type': 'application/json' }
+  }, options||{}));
+}
+
+function getProfileStorageKey(){
+  return loggedInUserId ? ('ds-profile-'+loggedInUserId) : ('ds-profile-'+(loggedInUser||'guest'));
+}
+
+function persistAuthSession(){
+  if(!loggedInUserId){
+    localStorage.removeItem('ds-auth-user');
+    return;
+  }
+  localStorage.setItem('ds-auth-user', JSON.stringify({
+    id: loggedInUserId,
+    displayName: loggedInUser||'',
+    email: loggedInUserEmail||''
+  }));
+}
+
+function restoreAuthSession(){
+  try{
+    var raw=localStorage.getItem('ds-auth-user');
+    var auth=null;
+    if(raw){
+      auth=JSON.parse(raw);
+    }else{
+      var legacyRaw=localStorage.getItem('user');
+      if(legacyRaw){
+        var legacy=JSON.parse(legacyRaw);
+        if(legacy && legacy.id){
+          auth={
+            id: legacy.id,
+            displayName: [legacy.prenom, legacy.nom].filter(Boolean).join(' ').trim() || 'Utilisateur',
+            email: legacy.email||''
+          };
+          localStorage.setItem('ds-auth-user', JSON.stringify(auth));
+        }
+      }
+    }
+    if(!auth || !auth.id) return;
+    loggedInUserId=auth.id;
+    loggedInUser=auth.displayName||'Utilisateur';
+    loggedInUserEmail=auth.email||'';
+    _syncBtn();
+    updateLoyaltyMini();
+    loadProfileAndOrders();
+  }catch(_e){}
+}
+
+function setAuthFromUser(user, fallbackEmail){
+  loggedInUserId=user.id;
+  loggedInUserEmail=user.email||fallbackEmail||'';
+  loggedInUser=(user.prenom||user.nom||loggedInUserEmail.split('@')[0]||'Utilisateur').trim();
+  persistAuthSession();
+  _syncBtn();
+}
+
+function clearAuthSession(){
+  loggedInUser=null;
+  loggedInUserId=null;
+  loggedInUserEmail='';
+  localStorage.removeItem('ds-auth-user');
+  localStorage.removeItem('user');
+}
+
+function splitFullName(fullName){
+  var parts=(fullName||'').trim().split(/\s+/).filter(Boolean);
+  return {
+    prenom: parts[0]||'',
+    nom: parts.slice(1).join(' ')||parts[0]||''
+  };
+}
+
+async function loadProfileAndOrders(){
+  if(!loggedInUserId) return;
+  try{
+    var profileRes=await fetch('/api/profile/'+loggedInUserId);
+    var profileData=await profileRes.json();
+    if(profileData.success && profileData.profile){
+      var p=profileData.profile;
+      if(p.prenom||p.nom) loggedInUser=((p.prenom||'')+' '+(p.nom||'')).trim();
+      if(p.email) loggedInUserEmail=p.email;
+      var cache={
+        firstName:p.prenom||'',
+        lastName:p.nom||'',
+        email:p.email||loggedInUserEmail||'',
+        phone:p.telephone||'',
+        address:p.adresseLivraison||'',
+        wilaya:p.wilaya||'',
+        loyaltyPoints:Number(p.pointsTotal||0),
+        loyaltyLevel:p.niveauFidelite||''
+      };
+      localStorage.setItem(getProfileStorageKey(), JSON.stringify(cache));
+      loyaltyPoints=cache.loyaltyPoints;
+      persistAuthSession();
+      _syncBtn();
+    }
+  }catch(_e){}
+
+  try{
+    var ordersRes=await fetch('/api/orders/'+loggedInUserId);
+    var ordersData=await ordersRes.json();
+    if(ordersData.success && Array.isArray(ordersData.orders)) orderHistory=ordersData.orders;
+  }catch(_e){}
+
+  updateLoyaltyMini();
+  if(document.getElementById('page-profile') && document.getElementById('page-profile').classList.contains('active')){
+    renderProfilePage();
+  }
+}
+
 function openAuthModal(){
-  if(loggedInUser){ openProfilePage(); return; }
+  if(loggedInUserId){ openProfilePage(); return; }
   switchAuthTab('login');
   document.getElementById('authModal').classList.add('open');
 }
@@ -1979,32 +2105,78 @@ async function loginUser(){
     setTimeout(function(){ window.location.href='Admin.html?autologin=admin'; },900);
     return;
   }
-  loggedInUser=email.split('@')[0];
-  _syncBtn();
+  try{
+    var res=await apiRequest('/api/login',{
+      method:'POST',
+      body:JSON.stringify({email:email,password:pass})
+    });
+    var data=await res.json();
+    if(!data.success || !data.user){
+      showToast('⚠️ '+(data.message||'Connexion impossible'));
+      return;
+    }
+    setAuthFromUser(data.user, email);
+    await loadProfileAndOrders();
+  }catch(_e){
+    showToast('⚠️ Erreur serveur, réessayez');
+    return;
+  }
   closeAuthModal();
-  updateLoyaltyMini();
   showToast('✓ '+T('loginSuccess')+' '+loggedInUser+' 👋');
 }
 
 async function registerUser(){
   var name=document.getElementById('regName').value.trim();
-  var email=document.getElementById('regEmail').value.trim();
+  var email=document.getElementById('regEmail').value.trim().toLowerCase();
   var pass=document.getElementById('regPass').value;
   var phone=document.getElementById('regPhone').value.trim();
   var address=document.getElementById('regAddress').value.trim();
   if(!name||!email||!pass||!phone||!address){showToast('⚠️ Remplissez tous les champs !');return;}
   if(pass.length<8){showToast('⚠️ Mot de passe trop court (8 car. min)');return;}
-  var parts=name.split(' ');
-  loggedInUser=parts[0];
-  loyaltyPoints=50;
-  localStorage.setItem('ds-profile-'+loggedInUser, JSON.stringify({
-    firstName:parts[0]||'', lastName:parts.slice(1).join(' ')||'',
-    email:email, phone:phone, address:address
-  }));
-  _syncBtn();
+  var info=splitFullName(name);
+  try{
+    var regRes=await apiRequest('/api/register',{
+      method:'POST',
+      body:JSON.stringify({
+        nom:info.nom,
+        prenom:info.prenom,
+        email:email,
+        password:pass,
+        telephone:phone
+      })
+    });
+    var regData=await regRes.json();
+    if(!regData.success){
+      showToast('⚠️ '+(regData.message||'Inscription impossible'));
+      return;
+    }
+    var logRes=await apiRequest('/api/login',{
+      method:'POST',
+      body:JSON.stringify({email:email,password:pass})
+    });
+    var logData=await logRes.json();
+    if(!logData.success || !logData.user){
+      showToast('✓ Compte créé. Connectez-vous maintenant.');
+      switchAuthTab('login');
+      document.getElementById('loginEmail').value=email;
+      return;
+    }
+    setAuthFromUser(logData.user, email);
+    localStorage.setItem(getProfileStorageKey(), JSON.stringify({
+      firstName:info.prenom||'',
+      lastName:info.nom||'',
+      email:email,
+      phone:phone,
+      address:address
+    }));
+    await saveProfile(true);
+    await loadProfileAndOrders();
+  }catch(_e){
+    showToast('⚠️ Erreur serveur, réessayez');
+    return;
+  }
   closeAuthModal();
-  updateLoyaltyMini();
-  showToast('🎉 Compte créé ! +50 points de bienvenue offerts !');
+  showToast('🎉 Compte créé et connecté avec succès !');
 }
 
 /* Synchronise UNIQUEMENT l'apparence du bouton nav — ne modifie jamais le listener */
@@ -2028,7 +2200,7 @@ function _syncBtn(){
 function updateConnectBtn(){ _syncBtn(); }
 
 function logoutUser(){
-  loggedInUser=null;
+  clearAuthSession();
   loyaltyPoints=0;
   orderHistory=[];
   _syncBtn();
@@ -2043,7 +2215,17 @@ function logoutUser(){
   showToast('👋 Déconnecté avec succès');
 }
 
+function switchAccountUser(){
+  logoutUser();
+  switchAuthTab('login');
+  openAuthModal();
+}
+
 function openProfilePage(){
+  if(!loggedInUserId){
+    openAuthModal();
+    return;
+  }
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.getElementById('page-profile').classList.add('active');
   document.querySelectorAll('.nav-link').forEach(function(b){ b.classList.remove('active'); });
@@ -2052,14 +2234,14 @@ function openProfilePage(){
 }
 
 function renderProfilePage(){
-  if(!loggedInUser) return;
-  var saved=JSON.parse(localStorage.getItem('ds-profile-'+loggedInUser)||'{}');
+  if(!loggedInUserId) return;
+  var saved=JSON.parse(localStorage.getItem(getProfileStorageKey())||'{}');
   var av=document.getElementById('profileAvatar');
   if(av) av.textContent=loggedInUser.substring(0,2).toUpperCase();
   var pn=document.getElementById('profileName');
   if(pn) pn.textContent=loggedInUser;
   var pe=document.getElementById('profileEmail');
-  if(pe) pe.textContent=saved.email||'(non renseigné)';
+  if(pe) pe.textContent=saved.email||loggedInUserEmail||'(non renseigné)';
   var f=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
   f('pfFirstName', saved.firstName||loggedInUser);
   f('pfLastName',  saved.lastName||'');
@@ -2068,10 +2250,14 @@ function renderProfilePage(){
   f('pfAddress',   saved.address||'');
   var t=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
   t('profileOrdersCount', orderHistory.length);
-  t('profilePtsCount',    loyaltyPoints);
+  t('profilePtsCount',    saved.loyaltyPoints||loyaltyPoints);
   t('profileWishCount',   wishlist.length);
-  var lvl=getLoyaltyLevel();
-  t('profileLvlBadge', lvl.icon+' '+lvl.name);
+  if(saved.loyaltyLevel){
+    t('profileLvlBadge', '🏅 '+saved.loyaltyLevel);
+  }else{
+    var lvl=getLoyaltyLevel();
+    t('profileLvlBadge', lvl.icon+' '+lvl.name);
+  }
   var dm=document.getElementById('prefDarkMode');
   if(dm) dm.checked=document.documentElement.getAttribute('data-theme')==='dark';
   var ordEl=document.getElementById('profileRecentOrders');
@@ -2090,8 +2276,8 @@ function renderProfilePage(){
   }
 }
 
-function saveProfile(){
-  if(!loggedInUser) return;
+async function saveProfile(silent){
+  if(!loggedInUserId) return;
   var data={
     firstName:(document.getElementById('pfFirstName')||{}).value||'',
     lastName: (document.getElementById('pfLastName') ||{}).value||'',
@@ -2100,23 +2286,61 @@ function saveProfile(){
     address:  (document.getElementById('pfAddress')  ||{}).value||''
   };
   Object.keys(data).forEach(function(k){ data[k]=data[k].trim(); });
-  localStorage.setItem('ds-profile-'+loggedInUser, JSON.stringify(data));
-  if(data.firstName){ loggedInUser=data.firstName; _syncBtn(); }
+  localStorage.setItem(getProfileStorageKey(), JSON.stringify(Object.assign({}, JSON.parse(localStorage.getItem(getProfileStorageKey())||'{}'), data)));
+  if(data.firstName||data.lastName){
+    loggedInUser=(data.firstName+' '+data.lastName).trim()||loggedInUser;
+    persistAuthSession();
+    _syncBtn();
+  }
   var pn=document.getElementById('profileName');   if(pn) pn.textContent=loggedInUser;
-  var pe=document.getElementById('profileEmail');  if(pe) pe.textContent=data.email||'(non renseigné)';
+  var pe=document.getElementById('profileEmail');  if(pe) pe.textContent=data.email||loggedInUserEmail||'(non renseigné)';
   var av=document.getElementById('profileAvatar'); if(av) av.textContent=loggedInUser.substring(0,2).toUpperCase();
-  showToast('✓ Profil sauvegardé !');
+  try{
+    var res=await apiRequest('/api/profile/'+loggedInUserId,{
+      method:'PUT',
+      body:JSON.stringify({
+        nom:data.lastName||'',
+        prenom:data.firstName||'',
+        telephone:data.phone||'',
+        adresseLivraison:data.address||'',
+        wilaya:data.wilaya||''
+      })
+    });
+    var out=await res.json();
+    if(!out.success){
+      showToast('⚠️ '+(out.message||'Mise à jour impossible'));
+      return;
+    }
+    await loadProfileAndOrders();
+    if(!silent) showToast('✓ Profil sauvegardé !');
+  }catch(_e){
+    showToast('⚠️ Erreur serveur, réessayez');
+  }
 }
 
-function changePassword(){
+async function changePassword(){
+  if(!loggedInUserId){showToast('⚠️ Connectez-vous d’abord');return;}
   var np=(document.getElementById('pfNewPass') ||{}).value||'';
   var cp=(document.getElementById('pfConfPass')||{}).value||'';
   if(!np||!cp){showToast('⚠️ Remplissez les deux champs');return;}
   if(np.length<8){showToast('⚠️ Mot de passe trop court (8 car. min)');return;}
   if(np!==cp){showToast('⚠️ Les mots de passe ne correspondent pas');return;}
-  document.getElementById('pfNewPass').value='';
-  document.getElementById('pfConfPass').value='';
-  showToast('🔑 Mot de passe mis à jour !');
+  try{
+    var res=await apiRequest('/api/password/'+loggedInUserId,{
+      method:'PUT',
+      body:JSON.stringify({newPassword:np})
+    });
+    var data=await res.json();
+    if(!data.success){
+      showToast('⚠️ '+(data.message||'Erreur changement mot de passe'));
+      return;
+    }
+    document.getElementById('pfNewPass').value='';
+    document.getElementById('pfConfPass').value='';
+    showToast('🔑 Mot de passe mis à jour !');
+  }catch(_e){
+    showToast('⚠️ Erreur serveur, réessayez');
+  }
 }
 
 
