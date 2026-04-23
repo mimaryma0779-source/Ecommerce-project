@@ -1085,7 +1085,7 @@ h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-
       </div>
     </div>
     <button class="tut-nav-btn" id="guideBtn" onclick="startTutorial()">Guide</button>
-    <button class="connect-btn" id="connectBtn" onclick="openAuthModal()">
+    <button class="connect-btn" id="connectBtn">
       <span id="connectIcon"></span><span id="connectText">Connexion</span>
     </button>
     <button class="cart-btn" id="cartBtn" onclick="nav('cart');setActive(null)">
@@ -1338,7 +1338,6 @@ h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-
           <div class="profile-badge" id="profileLvlBadge">🥉 Bronze</div>
         </div>
       </div>
-      <button class="profile-logout-btn" onclick="logoutUser()">⎋ Déconnexion</button>
     </div>
 
     <!-- Stats -->
@@ -1397,6 +1396,22 @@ h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-
       <div class="profile-section-title">🛍️ Commandes récentes</div>
       <div id="profileRecentOrders"></div>
     </div>
+
+    <!-- Bouton déconnexion standalone -->
+    <div style="text-align:center;padding:24px 0 40px;">
+      <button onclick="logoutUser()" style="
+        display:inline-flex;align-items:center;gap:10px;
+        padding:13px 32px;border-radius:10px;
+        background:var(--red-light);color:var(--red);
+        border:1.5px solid rgba(122,45,45,.25);
+        font-size:15px;font-weight:700;font-family:inherit;
+        cursor:pointer;transition:all .2s;
+      " onmouseover="this.style.background='var(--red)';this.style.color='#fff';"
+         onmouseout="this.style.background='var(--red-light)';this.style.color='var(--red)';">
+        ⎋ Se déconnecter
+      </button>
+    </div>
+
   </div>
 </div>
 
@@ -1927,8 +1942,24 @@ function closeMobileNav(){document.getElementById('mobileNav').classList.remove(
 /* ═══════════════════════════════════════════
    AUTH
 ═══════════════════════════════════════════ */
-function openAuthModal(){if(loggedInUser){openProfilePage();return;}switchAuthTab('login');document.getElementById('authModal').classList.add('open');}
-function closeAuthModal(){document.getElementById('authModal').classList.remove('open');}
+/* ══════════════════════════════════════════════════════
+   AUTH & PROFIL — VERSION FINALE CORRIGÉE
+   Le bouton #connectBtn n'a PAS de onclick dans le HTML.
+   Un seul addEventListener gère tout proprement.
+══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('connectBtn');
+  if(btn) btn.addEventListener('click', function(){
+    if(loggedInUser){ openProfilePage(); } else { openAuthModal(); }
+  });
+});
+
+function openAuthModal(){
+  if(loggedInUser){ openProfilePage(); return; }
+  switchAuthTab('login');
+  document.getElementById('authModal').classList.add('open');
+}
+function closeAuthModal(){ document.getElementById('authModal').classList.remove('open'); }
 function switchAuthTab(tab){
   document.getElementById('loginForm').classList.toggle('active',tab==='login');
   document.getElementById('registerForm').classList.toggle('active',tab==='register');
@@ -1936,136 +1967,150 @@ function switchAuthTab(tab){
   document.getElementById('registerTab').classList.toggle('active',tab==='register');
   document.getElementById('authTitle').textContent=tab==='login'?'Se Connecter':'Créer un compte';
 }
+
 async function loginUser(){
-  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
-  const pass=document.getElementById('loginPass').value;
+  var email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  var pass=document.getElementById('loginPass').value;
   if(!email||!pass){showToast('⚠️ '+T('fillAllFields'));return;}
-  // ── LIAISON ADMIN ──
   if(email==='admin@digitalstore.dz' && pass==='admin123'){
     closeAuthModal();
     showToast('🔐 Connexion Admin… Redirection en cours');
-    // Store admin session for seamless Admin.html bypass
     sessionStorage.setItem('ds-admin-auth','1');
-    setTimeout(()=>{ window.location.href='Admin.html?autologin=admin'; },900);
+    setTimeout(function(){ window.location.href='Admin.html?autologin=admin'; },900);
     return;
   }
   loggedInUser=email.split('@')[0];
-  updateConnectBtn();closeAuthModal();
+  _syncBtn();
+  closeAuthModal();
   updateLoyaltyMini();
   showToast('✓ '+T('loginSuccess')+' '+loggedInUser+' 👋');
 }
+
 async function registerUser(){
-  const name=document.getElementById('regName').value.trim();
-  const email=document.getElementById('regEmail').value.trim();
-  const pass=document.getElementById('regPass').value;
-  const phone=document.getElementById('regPhone').value.trim();
-  const address=document.getElementById('regAddress').value.trim();
+  var name=document.getElementById('regName').value.trim();
+  var email=document.getElementById('regEmail').value.trim();
+  var pass=document.getElementById('regPass').value;
+  var phone=document.getElementById('regPhone').value.trim();
+  var address=document.getElementById('regAddress').value.trim();
   if(!name||!email||!pass||!phone||!address){showToast('⚠️ Remplissez tous les champs !');return;}
   if(pass.length<8){showToast('⚠️ Mot de passe trop court (8 car. min)');return;}
-  loggedInUser=name.split(' ')[0];loyaltyPoints=50;
-  // Save profile data
-  const parts=name.split(' ');
+  var parts=name.split(' ');
+  loggedInUser=parts[0];
+  loyaltyPoints=50;
   localStorage.setItem('ds-profile-'+loggedInUser, JSON.stringify({
-    firstName:parts[0]||'',lastName:parts.slice(1).join(' ')||'',
-    email,phone,address
+    firstName:parts[0]||'', lastName:parts.slice(1).join(' ')||'',
+    email:email, phone:phone, address:address
   }));
-  updateConnectBtn();closeAuthModal();updateLoyaltyMini();
+  _syncBtn();
+  closeAuthModal();
+  updateLoyaltyMini();
   showToast('🎉 Compte créé ! +50 points de bienvenue offerts !');
 }
-function updateConnectBtn(){
-  const btn=document.getElementById('connectBtn');
-  const mnlProfile=document.getElementById('mnl-profile');
+
+/* Synchronise UNIQUEMENT l'apparence du bouton nav — ne modifie jamais le listener */
+function _syncBtn(){
+  var btn=document.getElementById('connectBtn');
+  var mnl=document.getElementById('mnl-profile');
+  if(!btn) return;
   if(loggedInUser){
     btn.classList.add('logged-in');
     document.getElementById('connectIcon').textContent='👤';
     document.getElementById('connectText').textContent=loggedInUser;
-    btn.onclick=()=>{ openProfilePage(); };
-    if(mnlProfile) mnlProfile.style.display='';
+    if(mnl) mnl.style.display='';
   } else {
     btn.classList.remove('logged-in');
     document.getElementById('connectIcon').textContent='';
-    document.getElementById('connectText').textContent='Connexion';
-    btn.onclick=openAuthModal;
-    if(mnlProfile) mnlProfile.style.display='none';
+    document.getElementById('connectText').textContent=T('navLogin')||'Connexion';
+    if(mnl) mnl.style.display='none';
   }
+}
+/* Alias public (utilisé par applyTranslations et saveProfile) */
+function updateConnectBtn(){ _syncBtn(); }
+
+function logoutUser(){
+  loggedInUser=null;
+  loyaltyPoints=0;
+  orderHistory=[];
+  _syncBtn();
+  updateLoyaltyMini();
+  /* Retour accueil sans passer par nav() pour éviter tout effet de bord */
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-home').classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(function(b){ b.classList.remove('active'); });
+  var nh=document.getElementById('nl-home');
+  if(nh) nh.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  showToast('👋 Déconnecté avec succès');
 }
 
 function openProfilePage(){
-  nav('profile');
-  setActive(null);
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
+  document.getElementById('page-profile').classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(function(b){ b.classList.remove('active'); });
+  window.scrollTo({top:0,behavior:'smooth'});
   renderProfilePage();
 }
 
 function renderProfilePage(){
   if(!loggedInUser) return;
-  // Avatar initials
-  const initials=loggedInUser.substring(0,2).toUpperCase();
-  document.getElementById('profileAvatar').textContent=initials;
-  document.getElementById('profileName').textContent=loggedInUser;
-  // Load saved profile data
-  const saved=JSON.parse(localStorage.getItem('ds-profile-'+loggedInUser)||'{}');
-  document.getElementById('profileEmail').textContent=saved.email||'(non renseigné)';
-  document.getElementById('pfFirstName').value=saved.firstName||loggedInUser;
-  document.getElementById('pfLastName').value=saved.lastName||'';
-  document.getElementById('pfEmail').value=saved.email||'';
-  document.getElementById('pfPhone').value=saved.phone||'';
-  document.getElementById('pfAddress').value=saved.address||'';
-  // Stats
-  document.getElementById('profileOrdersCount').textContent=orderHistory.length;
-  document.getElementById('profilePtsCount').textContent=loyaltyPoints;
-  document.getElementById('profileWishCount').textContent=wishlist.length;
-  // Level badge
-  const lvl=getLoyaltyLevel();
-  document.getElementById('profileLvlBadge').textContent=lvl.icon+' '+lvl.name;
-  // Dark mode toggle sync
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  document.getElementById('prefDarkMode').checked=isDark;
-  // Recent orders
-  const ordEl=document.getElementById('profileRecentOrders');
+  var saved=JSON.parse(localStorage.getItem('ds-profile-'+loggedInUser)||'{}');
+  var av=document.getElementById('profileAvatar');
+  if(av) av.textContent=loggedInUser.substring(0,2).toUpperCase();
+  var pn=document.getElementById('profileName');
+  if(pn) pn.textContent=loggedInUser;
+  var pe=document.getElementById('profileEmail');
+  if(pe) pe.textContent=saved.email||'(non renseigné)';
+  var f=function(id,v){var e=document.getElementById(id);if(e)e.value=v||'';};
+  f('pfFirstName', saved.firstName||loggedInUser);
+  f('pfLastName',  saved.lastName||'');
+  f('pfEmail',     saved.email||'');
+  f('pfPhone',     saved.phone||'');
+  f('pfAddress',   saved.address||'');
+  var t=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  t('profileOrdersCount', orderHistory.length);
+  t('profilePtsCount',    loyaltyPoints);
+  t('profileWishCount',   wishlist.length);
+  var lvl=getLoyaltyLevel();
+  t('profileLvlBadge', lvl.icon+' '+lvl.name);
+  var dm=document.getElementById('prefDarkMode');
+  if(dm) dm.checked=document.documentElement.getAttribute('data-theme')==='dark';
+  var ordEl=document.getElementById('profileRecentOrders');
+  if(!ordEl) return;
   if(!orderHistory.length){
-    ordEl.innerHTML=`<div style="text-align:center;padding:32px;color:var(--muted)"><div style="font-size:36px;margin-bottom:10px">📦</div><p>Aucune commande pour l'instant</p><button class="btn btn-teal" style="margin-top:14px" onclick="nav('catalog');setActive(document.getElementById('nl-catalog'))">Explorer le catalogue</button></div>`;
+    ordEl.innerHTML='<div style="text-align:center;padding:32px;color:var(--muted)"><div style="font-size:36px;margin-bottom:10px">📦</div><p>Aucune commande pour l\'instant</p><button class="btn btn-teal" style="margin-top:14px" onclick="nav(\'catalog\');setActive(document.getElementById(\'nl-catalog\'))">Explorer le catalogue</button></div>';
     return;
   }
-  const sColor={'livré':'var(--green)','en préparation':'var(--teal)','en transit':'var(--orange)','annulé':'var(--red)'};
-  const sBg={'livré':'var(--green-light)','en préparation':'var(--teal-light)','en transit':'var(--orange-light)','annulé':'var(--red-light)'};
-  ordEl.innerHTML=orderHistory.slice(0,4).map(o=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-weight:700;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--teal)">#${o.id}</div>
-        <div style="font-size:13px;color:var(--muted);margin-top:2px">${o.date} · ${o.items.map(i=>i.name).join(', ')}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:12px">
-        <span style="font-weight:700;font-size:14px">${o.total.toLocaleString('fr-DZ')} DA</span>
-        <span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;background:${sBg[o.status]||'var(--bg)'};color:${sColor[o.status]||'var(--muted)'}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span>
-      </div>
-    </div>`).join('');
+  var sColor={'livré':'var(--green)','en préparation':'var(--teal)','en transit':'var(--orange)','annulé':'var(--red)'};
+  var sBg={'livré':'var(--green-light)','en préparation':'var(--teal-light)','en transit':'var(--orange-light)','annulé':'var(--red-light)'};
+  ordEl.innerHTML=orderHistory.slice(0,4).map(function(o){
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px"><div><div style="font-weight:700;font-family:\'JetBrains Mono\',monospace;font-size:13px;color:var(--teal)">#'+o.id+'</div><div style="font-size:13px;color:var(--muted);margin-top:2px">'+o.date+' · '+o.items.map(function(i){return i.name;}).join(', ')+'</div></div><div style="display:flex;align-items:center;gap:12px"><span style="font-weight:700;font-size:14px">'+o.total.toLocaleString('fr-DZ')+' DA</span><span style="font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;background:'+(sBg[o.status]||'var(--bg)')+';color:'+(sColor[o.status]||'var(--muted)')+'">'+o.status.charAt(0).toUpperCase()+o.status.slice(1)+'</span></div></div>';
+  }).join('');
   if(orderHistory.length>4){
-    ordEl.innerHTML+=`<div style="text-align:center;padding:14px 0"><button class="btn btn-outline" style="font-size:13px" onclick="nav('orders');setActive(document.getElementById('nl-orders'))">Voir toutes les commandes →</button></div>`;
+    ordEl.innerHTML+='<div style="text-align:center;padding:14px 0"><button class="btn btn-outline" style="font-size:13px" onclick="nav(\'orders\');setActive(document.getElementById(\'nl-orders\'))">Voir toutes les commandes →</button></div>';
   }
 }
 
 function saveProfile(){
   if(!loggedInUser) return;
-  const data={
-    firstName:document.getElementById('pfFirstName').value.trim(),
-    lastName:document.getElementById('pfLastName').value.trim(),
-    email:document.getElementById('pfEmail').value.trim(),
-    phone:document.getElementById('pfPhone').value.trim(),
-    address:document.getElementById('pfAddress').value.trim()
+  var data={
+    firstName:(document.getElementById('pfFirstName')||{}).value||'',
+    lastName: (document.getElementById('pfLastName') ||{}).value||'',
+    email:    (document.getElementById('pfEmail')    ||{}).value||'',
+    phone:    (document.getElementById('pfPhone')    ||{}).value||'',
+    address:  (document.getElementById('pfAddress')  ||{}).value||''
   };
-  localStorage.setItem('ds-profile-'+loggedInUser,JSON.stringify(data));
-  // Update display name if firstName changed
-  if(data.firstName){ loggedInUser=data.firstName; updateConnectBtn(); }
-  document.getElementById('profileName').textContent=loggedInUser;
-  document.getElementById('profileEmail').textContent=data.email||'(non renseigné)';
-  const initials=loggedInUser.substring(0,2).toUpperCase();
-  document.getElementById('profileAvatar').textContent=initials;
+  Object.keys(data).forEach(function(k){ data[k]=data[k].trim(); });
+  localStorage.setItem('ds-profile-'+loggedInUser, JSON.stringify(data));
+  if(data.firstName){ loggedInUser=data.firstName; _syncBtn(); }
+  var pn=document.getElementById('profileName');   if(pn) pn.textContent=loggedInUser;
+  var pe=document.getElementById('profileEmail');  if(pe) pe.textContent=data.email||'(non renseigné)';
+  var av=document.getElementById('profileAvatar'); if(av) av.textContent=loggedInUser.substring(0,2).toUpperCase();
   showToast('✓ Profil sauvegardé !');
 }
 
 function changePassword(){
-  const np=document.getElementById('pfNewPass').value;
-  const cp=document.getElementById('pfConfPass').value;
+  var np=(document.getElementById('pfNewPass') ||{}).value||'';
+  var cp=(document.getElementById('pfConfPass')||{}).value||'';
   if(!np||!cp){showToast('⚠️ Remplissez les deux champs');return;}
   if(np.length<8){showToast('⚠️ Mot de passe trop court (8 car. min)');return;}
   if(np!==cp){showToast('⚠️ Les mots de passe ne correspondent pas');return;}
@@ -2074,17 +2119,6 @@ function changePassword(){
   showToast('🔑 Mot de passe mis à jour !');
 }
 
-function logoutUser(){
-  loggedInUser=null;
-  loyaltyPoints=0;
-  orderHistory=[];
-  updateConnectBtn();
-  updateLoyaltyMini();
-  nav('home');
-  setActive(document.getElementById('nl-home'));
-  showToast('👋 Déconnecté avec succès');
-}
-document.getElementById('authModal').addEventListener('click',e=>{if(e.target===document.getElementById('authModal'))closeAuthModal();});
 
 /* ═══════════════════════════════════════════
    PAYMENT
