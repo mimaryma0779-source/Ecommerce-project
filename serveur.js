@@ -2,6 +2,9 @@ const express = require("express");
 const mysql = require("mysql2");
 const path = require("path");
 const bcrypt = require("bcrypt");
+const fs = require("fs");
+const cors = require("cors");
+const crypto = require("crypto");
 
 const app = express();
 
@@ -10,6 +13,7 @@ const app = express();
 ========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 /* =========================
    DB
@@ -21,18 +25,87 @@ const db = mysql.createConnection({
   database: "digital_store_db"
 });
 
-db.connect((err) => {
-  if (err) console.log("❌ DB error:", err);
-  else console.log("✅ MySQL connected");
+const ADMIN_DATA_KEYS = [
+  "products",
+  "users",
+  "orders",
+  "reviews",
+  "categories",
+  "criteria",
+  "deliveries",
+  "reco"
+];
+const adminSessions = new Map();
+const DEFAULT_ADMIN_EMAIL = "admin@digitalstore.dz";
+const DEFAULT_ADMIN_PASSWORD = "admin123";
+
+const query = (sql, params = []) =>
+  new Promise((resolve, reject) => {
+    db.query(sql, params, (err, rows) => (err ? reject(err) : resolve(rows)));
+  });
+
+function createAdminToken(email) {
+  const token = crypto.randomBytes(24).toString("hex");
+  adminSessions.set(token, { email, createdAt: Date.now() });
+  return token;
+}
+
+function requireAdminAuth(req, res, next) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice("Bearer ".length).trim()
+    : "";
+  if (!token || !adminSessions.has(token)) {
+    return res.status(401).json({ success: false, message: "Session admin invalide" });
+  }
+  req.adminSession = adminSessions.get(token);
+  next();
+}
+
+async function ensureAdminStorage() {
+  const sql = `
+    CREATE TABLE IF NOT EXISTS admin_state (
+      state_key VARCHAR(100) PRIMARY KEY,
+      state_value LONGTEXT NOT NULL,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )
+  `;
+  await query(sql);
+}
+
+db.connect(async (err) => {
+  if (err) {
+    console.log("❌ DB error:", err);
+    return;
+  }
+  console.log("✅ MySQL connected");
+  try {
+    await ensureAdminStorage();
+    console.log("✅ Admin storage ready");
+  } catch (storageErr) {
+    console.log("❌ Admin storage error:", storageErr);
+  }
 });
 
 /* =========================
    FRONTEND
 ========================= */
-app.use(express.static("FrontEnd"));
+const FRONTEND_CANDIDATES = [
+  
+  path.join(__dirname, "..", "Ecommerce-project", "FrontEnd")
+];
+const FRONTEND_DIR = FRONTEND_CANDIDATES.find((dir) => fs.existsSync(dir));
+
+if (FRONTEND_DIR) {
+  app.use(express.static(FRONTEND_DIR));
+}
+app.use(express.static(path.resolve(__dirname, "..")));
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "FrontEnd", "FenetreDemarage.HTML"));
+  if (!FRONTEND_DIR) {
+    return res.status(500).send("Dossier FrontEnd introuvable");
+  }
+  res.sendFile(path.join(FRONTEND_DIR, "FenetreDemarage.HTML"));
 });
 
 /* =========================
@@ -223,6 +296,72 @@ app.post("/api/orders", (req, res) => {
       );
     });
   });
+});
+
+/* =========================
+   ADMIN AUTH + DATA API
+========================= */
+app.post("/api/admin/login", async (req, res) => {
+  const { email, password } = req.body || {};
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: "Champs manquants" });
+  }
+
+  if (email === DEFAULT_ADMIN_EMAIL && password === DEFAULT_ADMIN_PASSWORD) {
+    const token = createAdminToken(email);
+    return res.json({
+      success: true,
+      user: { id: 0, nom: "Admin", prenom: "Demo", email },
+      token
+    });
+  }
+
+  return res.status(401).json({ success: false, message: "Identifiants admin invalides" });
+});
+
+app.get("/api/admin/data", requireAdminAuth, async (req, res) => {
+  try {
+    const rows = await query(
+      "SELECT state_key, state_value FROM admin_state WHERE state_key IN (?)",
+      [ADMIN_DATA_KEYS]
+    );
+
+    const data = {};
+    for (const row of rows) {
+      try {
+        data[row.state_key] = JSON.parse(row.state_value);
+      } catch {
+        data[row.state_key] = row.state_value;
+      }
+    }
+
+    res.json({ success: true, data });
+  } catch (error) {
+    console.log("Admin data load error:", error);
+    res.status(500).json({ success: false, message: "Erreur chargement admin" });
+  }
+});
+
+app.put("/api/admin/data/:key", requireAdminAuth, async (req, res) => {
+  const { key } = req.params;
+  if (!ADMIN_DATA_KEYS.includes(key)) {
+    return res.status(400).json({ success: false, message: "Cle inconnue" });
+  }
+
+  try {
+    const payload = JSON.stringify(req.body?.value ?? null);
+    await query(
+      `INSERT INTO admin_state (state_key, state_value)
+       VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE state_value = VALUES(state_value), updated_at = CURRENT_TIMESTAMP`,
+      [key, payload]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.log("Admin data save error:", error);
+    res.status(500).json({ success: false, message: "Erreur sauvegarde admin" });
+  }
 });
 
 
