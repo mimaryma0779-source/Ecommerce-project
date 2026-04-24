@@ -254,6 +254,23 @@ nav {
   font-family: inherit; display: flex; align-items: center; gap: 6px; white-space: nowrap;
 }
 .connect-btn:hover, .connect-btn.logged-in { background: var(--teal); color: #fff; border-color: var(--teal); }
+.admin-nav-btn {
+  padding: 7px 15px;
+  border-radius: var(--rs);
+  background: var(--teal-light);
+  color: var(--teal);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1.5px solid var(--teal);
+  transition: all var(--t);
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.admin-nav-btn:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
 
 .nav-badge {
   background: var(--teal); color: #fff;
@@ -1085,6 +1102,9 @@ h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-
       </div>
     </div>
     <button class="tut-nav-btn" id="guideBtn" onclick="startTutorial()">Guide</button>
+    <button class="admin-nav-btn" id="adminAccessBtn" onclick="openAdminSpace()" style="display:none">
+      <span>🔐</span><span>Espace admin</span>
+    </button>
     <button class="connect-btn" id="connectBtn">
       <span id="connectIcon"></span><span id="connectText">Connexion</span>
     </button>
@@ -1105,6 +1125,7 @@ h2 { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-
   <button class="nav-link" id="mnl-orders" onclick="nav('orders');closeMobileNav()">Commandes</button>
   <button class="nav-link" id="mnl-loyalty" onclick="nav('loyalty');closeMobileNav()">Fidélité</button>
   <button class="nav-link" id="mnl-track" onclick="nav('track');closeMobileNav()">Suivi</button>
+  <button class="nav-link" id="mnl-admin" onclick="openAdminSpace();closeMobileNav()" style="display:none">Espace admin</button>
   <button class="nav-link" id="mnl-profile" onclick="openProfilePage();closeMobileNav()" style="display:none">👤 Mon Profil</button>
   <button class="nav-link" id="mnl-guide" onclick="startTutorial();closeMobileNav()">Guide</button>
   <button class="nav-link" onclick="toggleDarkMode();closeMobileNav()" id="mobileThemeBtn">◑ Mode sombre</button>
@@ -2042,6 +2063,49 @@ function splitFullName(fullName){
   };
 }
 
+const ADMIN_ALLOWED_EMAILS = ['admin@digitalstore.dz'];
+
+function isMainAdmin(){
+  return ADMIN_ALLOWED_EMAILS.includes((loggedInUserEmail||'').trim().toLowerCase());
+}
+
+function syncAdminAccessBtn(){
+  var desktopBtn=document.getElementById('adminAccessBtn');
+  var mobileBtn=document.getElementById('mnl-admin');
+  var show=isMainAdmin();
+  if(desktopBtn) desktopBtn.style.display=show?'flex':'none';
+  if(mobileBtn) mobileBtn.style.display=show?'':'none';
+}
+
+function openAdminSpace(){
+  if(!isMainAdmin()){
+    showToast('⚠️ Espace admin réservé au compte administrateur');
+    return;
+  }
+  fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'admin@digitalstore.dz', password: 'admin123' })
+  })
+    .then(function(res){ return res.json(); })
+    .then(function(data){
+      if(!data || !data.success || !data.token){
+        throw new Error((data && data.message) || 'Connexion admin impossible');
+      }
+      localStorage.setItem('ds_admin_user', JSON.stringify(data.user || {
+        id: loggedInUserId||0,
+        nom: loggedInUser||'Admin',
+        prenom: '',
+        email: (loggedInUserEmail||'admin@digitalstore.dz')
+      }));
+      localStorage.setItem('ds_admin_token', data.token);
+      window.location.href='FenetreAdmine.html?autologin=admin';
+    })
+    .catch(function(err){
+      showToast('⚠️ '+(err.message||'Connexion admin impossible'));
+    });
+}
+
 async function loadProfileAndOrders(){
   if(!loggedInUserId) return;
   try{
@@ -2102,7 +2166,10 @@ async function loginUser(){
     closeAuthModal();
     showToast('🔐 Connexion Admin… Redirection en cours');
     sessionStorage.setItem('ds-admin-auth','1');
-    setTimeout(function(){ window.location.href='Admin.html?autologin=admin'; },900);
+    loggedInUser='Admin';
+    loggedInUserId=0;
+    loggedInUserEmail='admin@digitalstore.dz';
+    setTimeout(function(){ openAdminSpace(); },900);
     return;
   }
   try{
@@ -2195,6 +2262,7 @@ function _syncBtn(){
     document.getElementById('connectText').textContent=T('navLogin')||'Connexion';
     if(mnl) mnl.style.display='none';
   }
+  syncAdminAccessBtn();
 }
 /* Alias public (utilisé par applyTranslations et saveProfile) */
 function updateConnectBtn(){ _syncBtn(); }
