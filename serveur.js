@@ -8,9 +8,6 @@ const crypto = require("crypto");
 
 const app = express();
 
-/* =========================
-   MIDDLEWARE (IMPORTANT)
-========================= */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -25,16 +22,7 @@ const db = mysql.createConnection({
   database: "digital_store_db"
 });
 
-const ADMIN_DATA_KEYS = [
-  "products",
-  "users",
-  "orders",
-  "reviews",
-  "categories",
-  "criteria",
-  "deliveries",
-  "reco"
-];
+const ADMIN_DATA_KEYS = ["products","users","orders","reviews","categories","criteria","deliveries","reco"];
 const adminSessions = new Map();
 const DEFAULT_ADMIN_EMAIL = "admin@digitalstore.dz";
 const DEFAULT_ADMIN_PASSWORD = "admin123";
@@ -52,59 +40,37 @@ function createAdminToken(email) {
 
 function requireAdminAuth(req, res, next) {
   const authHeader = req.headers.authorization || "";
-  const token = authHeader.startsWith("Bearer ")
-    ? authHeader.slice("Bearer ".length).trim()
-    : "";
-  if (!token || !adminSessions.has(token)) {
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+  if (!token || !adminSessions.has(token))
     return res.status(401).json({ success: false, message: "Session admin invalide" });
-  }
   req.adminSession = adminSessions.get(token);
   next();
 }
 
 async function ensureAdminStorage() {
-  const sql = `
+  await query(`
     CREATE TABLE IF NOT EXISTS admin_state (
       state_key VARCHAR(100) PRIMARY KEY,
       state_value LONGTEXT NOT NULL,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
-  `;
-  await query(sql);
+  `);
 }
 
 db.connect(async (err) => {
-  if (err) {
-    console.log("❌ DB error:", err);
-    return;
-  }
+  if (err) { console.log("❌ DB error:", err); return; }
   console.log("✅ MySQL connected");
-  try {
-    await ensureAdminStorage();
-    console.log("✅ Admin storage ready");
-  } catch (storageErr) {
-    console.log("❌ Admin storage error:", storageErr);
-  }
+  try { await ensureAdminStorage(); console.log("✅ Admin storage ready"); }
+  catch (e) { console.log("❌ Admin storage error:", e); }
 });
 
 /* =========================
    FRONTEND
 ========================= */
-const FRONTEND_CANDIDATES = [
-  
-  path.join(__dirname, "..", "Ecommerce-project", "FrontEnd")
-];
-const FRONTEND_DIR = FRONTEND_CANDIDATES.find((dir) => fs.existsSync(dir));
-
-if (FRONTEND_DIR) {
-  app.use(express.static(FRONTEND_DIR));
-}
-app.use(express.static(path.resolve(__dirname, "..")));
+const FRONTEND_DIR = path.join(__dirname, "FrontEnd");
+app.use(express.static(FRONTEND_DIR));
 
 app.get("/", (req, res) => {
-  if (!FRONTEND_DIR) {
-    return res.status(500).send("Dossier FrontEnd introuvable");
-  }
   res.sendFile(path.join(FRONTEND_DIR, "FenetreDemarage.HTML"));
 });
 
@@ -113,44 +79,52 @@ app.get("/", (req, res) => {
 ========================= */
 app.post("/api/register", async (req, res) => {
   const { nom, prenom, email, password, telephone } = req.body;
+  if (!email || !password) return res.json({ success: false, message: "Champs manquants" });
+  try {
+    const existing = await query("SELECT idUtilisateur FROM utilisateur WHERE email = ?", [email]);
+    if (existing.length > 0) return res.json({ success: false, message: "Email déjà utilisé" });
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const result = await query(
+      `INSERT INTO utilisateur (nom, prenom, email, motDePasse, telephone, typeUtilisateur, dateInscription, estActif)
+       VALUES (?, ?, ?, ?, ?, 'client', NOW(), 1)`,
+      [nom || "", prenom || "", email, hashedPassword, telephone || ""]
+    );
+    const newId = result.insertId;
 
-  const sql = `
-    INSERT INTO utilisateur
-    (nom, prenom, email, motDePasse, telephone, typeUtilisateur, dateInscription, estActif)
-    VALUES (?, ?, ?, ?, ?, 'client', NOW(), 1)
-  `;
+    await query(
+      `INSERT IGNORE INTO client (idUtilisateur, adresseLivraison, wilaya) VALUES (?, '', '')`,
+      [newId]
+    ).catch(() => {});
 
-  db.query(sql, [nom, prenom, email, hashedPassword, telephone], (err) => {
-    if (err) {
-      console.log(err);
-      return res.json({ success: false, message: "Erreur inscription" });
-    }
+    await query(
+      `INSERT IGNORE INTO comptefidelite (pointsTotal, dateMAJ, idClient, idNiveau) VALUES (0, NOW(), ?, 1)`,
+      [newId]
+    ).catch(() => {});
+
     res.json({ success: true });
-  });
+  } catch (err) {
+    console.log("Register error:", err);
+    res.json({ success: false, message: "Erreur inscription" });
+  }
 });
 
 /* =========================
    LOGIN
 ========================= */
-app.post("/api/login", (req, res) => {
+app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
-
-  const sql = "SELECT * FROM utilisateur WHERE email = ? AND estActif = 1";
-
-  db.query(sql, [email], async (err, results) => {
-    if (err || results.length === 0) {
-      return res.json({ success: false, message: "Utilisateur introuvable" });
-    }
+  if (!email || !password) return res.json({ success: false, message: "Champs manquants" });
+  try {
+    const results = await query(
+      "SELECT * FROM utilisateur WHERE email = ? AND estActif = 1",
+      [email]
+    );
+    if (!results.length) return res.json({ success: false, message: "Utilisateur introuvable" });
 
     const user = results[0];
-
     const match = await bcrypt.compare(password, user.motDePasse);
-
-    if (!match) {
-      return res.json({ success: false, message: "Mot de passe incorrect" });
-    }
+    if (!match) return res.json({ success: false, message: "Mot de passe incorrect" });
 
     res.json({
       success: true,
@@ -158,32 +132,39 @@ app.post("/api/login", (req, res) => {
         id: user.idUtilisateur,
         nom: user.nom,
         prenom: user.prenom,
+        email: user.email,
         type: user.typeUtilisateur
       }
     });
-  });
+  } catch (err) {
+    console.log("Login error:", err);
+    res.json({ success: false, message: "Erreur serveur" });
+  }
 });
 
 /* =========================
    GET PROFILE
 ========================= */
-app.get("/api/profile/:id", (req, res) => {
-  const sql = `
-    SELECT u.idUtilisateur, u.nom, u.prenom, u.email, u.telephone,
-           c.adresseLivraison, c.wilaya,
-           cf.pointsTotal,
-           nf.libelle AS niveauFidelite
-    FROM utilisateur u
-    LEFT JOIN client c ON c.idUtilisateur = u.idUtilisateur
-    LEFT JOIN comptefidelite cf ON cf.idClient = u.idUtilisateur
-    LEFT JOIN niveaufidelite nf ON nf.idNiveau = cf.idNiveau
-    WHERE u.idUtilisateur = ?
-  `;
-  db.query(sql, [req.params.id], (err, results) => {
-    if (err || !results.length)
-      return res.json({ success: false, message: "Profil introuvable" });
+app.get("/api/profile/:id", async (req, res) => {
+  try {
+    const results = await query(`
+      SELECT u.idUtilisateur, u.nom, u.prenom, u.email, u.telephone,
+             c.adresseLivraison, c.wilaya,
+             COALESCE(cf.pointsTotal, 0) AS pointsTotal,
+             nf.libelle AS niveauFidelite
+      FROM utilisateur u
+      LEFT JOIN client c ON c.idUtilisateur = u.idUtilisateur
+      LEFT JOIN comptefidelite cf ON cf.idClient = u.idUtilisateur
+      LEFT JOIN niveaufidelite nf ON nf.idNiveau = cf.idNiveau
+      WHERE u.idUtilisateur = ?
+    `, [req.params.id]);
+
+    if (!results.length) return res.json({ success: false, message: "Profil introuvable" });
     res.json({ success: true, profile: results[0] });
-  });
+  } catch (err) {
+    console.log("Profile error:", err);
+    res.json({ success: false, message: "Erreur serveur" });
+  }
 });
 
 /* =========================
@@ -191,19 +172,21 @@ app.get("/api/profile/:id", (req, res) => {
 ========================= */
 app.put("/api/profile/:id", async (req, res) => {
   const { nom, prenom, telephone, adresseLivraison, wilaya } = req.body;
-  const sqlU = `UPDATE utilisateur SET nom=?, prenom=?, telephone=? WHERE idUtilisateur=?`;
-  db.query(sqlU, [nom, prenom, telephone, req.params.id], (err) => {
-    if (err) return res.json({ success: false, message: "Erreur mise à jour utilisateur" });
-    const sqlC = `
-      INSERT INTO client (idUtilisateur, adresseLivraison, wilaya)
-      VALUES (?, ?, ?)
-      ON DUPLICATE KEY UPDATE adresseLivraison=VALUES(adresseLivraison), wilaya=VALUES(wilaya)
-    `;
-    db.query(sqlC, [req.params.id, adresseLivraison, wilaya], (err2) => {
-      if (err2) return res.json({ success: false, message: "Erreur mise à jour client" });
-      res.json({ success: true });
-    });
-  });
+  try {
+    await query(
+      "UPDATE utilisateur SET nom=?, prenom=?, telephone=? WHERE idUtilisateur=?",
+      [nom || "", prenom || "", telephone || "", req.params.id]
+    );
+    await query(
+      `INSERT INTO client (idUtilisateur, adresseLivraison, wilaya) VALUES (?, ?, ?)
+       ON DUPLICATE KEY UPDATE adresseLivraison=VALUES(adresseLivraison), wilaya=VALUES(wilaya)`,
+      [req.params.id, adresseLivraison || "", wilaya || ""]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.log("Profile update error:", err);
+    res.json({ success: false, message: "Erreur mise à jour" });
+  }
 });
 
 /* =========================
@@ -213,33 +196,30 @@ app.put("/api/password/:id", async (req, res) => {
   const { newPassword } = req.body;
   if (!newPassword || newPassword.length < 8)
     return res.json({ success: false, message: "Mot de passe trop court" });
-  const hashed = await bcrypt.hash(newPassword, 10);
-  db.query(
-    "UPDATE utilisateur SET motDePasse=? WHERE idUtilisateur=?",
-    [hashed, req.params.id],
-    (err) => {
-      if (err) return res.json({ success: false, message: "Erreur changement mot de passe" });
-      res.json({ success: true });
-    }
-  );
+  try {
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await query("UPDATE utilisateur SET motDePasse=? WHERE idUtilisateur=?", [hashed, req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.json({ success: false, message: "Erreur changement mot de passe" });
+  }
 });
 
 /* =========================
    GET ORDERS
 ========================= */
-app.get("/api/orders/:id", (req, res) => {
-  const sql = `
-    SELECT c.idCommande, c.statut, c.dateCommande, c.montantTotal,
-           lc.quantite, lc.prixUnitaire, p.nom AS nomProduit
-    FROM commande c
-    JOIN lignecommande lc ON lc.idCommande = c.idCommande
-    JOIN produit p ON p.idProduit = lc.idProduit
-    WHERE c.idClient = ?
-    ORDER BY c.dateCommande DESC
-  `;
-  db.query(sql, [req.params.id], (err, rows) => {
-    if (err) return res.json({ success: false });
-    // Grouper les lignes par commande
+app.get("/api/orders/:id", async (req, res) => {
+  try {
+    const rows = await query(`
+      SELECT c.idCommande, c.statut, c.dateCommande, c.montantTotal,
+             lc.quantite, lc.prixUnitaire, p.nom AS nomProduit
+      FROM commande c
+      JOIN lignecommande lc ON lc.idCommande = c.idCommande
+      JOIN produit p ON p.idProduit = lc.idProduit
+      WHERE c.idClient = ?
+      ORDER BY c.dateCommande DESC
+    `, [req.params.id]);
+
     const map = {};
     rows.forEach(r => {
       if (!map[r.idCommande]) {
@@ -247,55 +227,237 @@ app.get("/api/orders/:id", (req, res) => {
           id: "DS-" + r.idCommande,
           date: new Date(r.dateCommande).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
           status: r.statut,
-          total: r.montantTotal,
+          total: Number(r.montantTotal),
           items: []
         };
       }
-      map[r.idCommande].items.push({
-        name: r.nomProduit,
-        qty: r.quantite,
-        price: r.prixUnitaire
-      });
+      map[r.idCommande].items.push({ name: r.nomProduit, qty: r.quantite, price: Number(r.prixUnitaire) });
     });
     res.json({ success: true, orders: Object.values(map) });
-  });
+  } catch (err) {
+    console.log("Orders error:", err);
+    res.json({ success: false, orders: [] });
+  }
 });
 
 /* =========================
    SAVE ORDER
 ========================= */
-app.post("/api/orders", (req, res) => {
+app.post("/api/orders", async (req, res) => {
   const { idClient, adresseLivraison, wilaya, montantTotal, items, typePaiement } = req.body;
-  const sqlCmd = `
-    INSERT INTO commande (statut, adresseLivraison, wilaya, montantTotal, idClient)
-    VALUES ('en préparation', ?, ?, ?, ?)
-  `;
-  db.query(sqlCmd, [adresseLivraison, wilaya, montantTotal, idClient], (err, result) => {
-    if (err) return res.json({ success: false, message: "Erreur création commande" });
+  if (!idClient || !items || !items.length)
+    return res.json({ success: false, message: "Données incomplètes" });
+  try {
+    const result = await query(
+      `INSERT INTO commande (statut, adresseLivraison, wilaya, montantTotal, idClient, dateCommande)
+       VALUES ('en préparation', ?, ?, ?, ?, NOW())`,
+      [adresseLivraison || "", wilaya || "", montantTotal, idClient]
+    );
     const idCommande = result.insertId;
-    // Insérer les lignes de commande
-    const lignes = items.map(i => [idCommande, i.idProduit, i.quantite, i.prix]);
-    db.query("INSERT INTO lignecommande (idCommande, idProduit, quantite, prixUnitaire) VALUES ?", [lignes], (err2) => {
-      if (err2) return res.json({ success: false, message: "Erreur lignes commande" });
-      // Insérer le paiement
-      db.query(
-        "INSERT INTO paiement (typePaiement, montant, datePaiement, statut, idCommande) VALUES (?, ?, NOW(), 'en attente', ?)",
-        [typePaiement, montantTotal, idCommande],
-        (err3) => {
-          if (err3) return res.json({ success: false });
-          // Mettre à jour les points de fidélité
-          const pts = Math.floor(montantTotal / 1000);
-          db.query(
-            `INSERT INTO comptefidelite (pointsTotal, dateMAJ, idClient, idNiveau)
-             VALUES (?, NOW(), ?, 1)
-             ON DUPLICATE KEY UPDATE pointsTotal = pointsTotal + ?, dateMAJ = NOW()`,
-            [pts, idClient, pts],
-            () => res.json({ success: true, idCommande: "DS-" + idCommande })
-          );
-        }
+
+    for (const item of items) {
+      await query(
+        "INSERT INTO lignecommande (idCommande, idProduit, quantite, prixUnitaire) VALUES (?, ?, ?, ?)",
+        [idCommande, item.idProduit || 0, item.quantite || item.qty || 1, item.prix || item.price || 0]
       );
+    }
+
+    await query(
+      "INSERT INTO paiement (typePaiement, montant, datePaiement, statut, idCommande) VALUES (?, ?, NOW(), 'en attente', ?)",
+      [typePaiement || "cod", montantTotal, idCommande]
+    );
+
+    const pts = Math.floor(montantTotal / 1000);
+    await query(
+      `INSERT INTO comptefidelite (pointsTotal, dateMAJ, idClient, idNiveau)
+       VALUES (?, NOW(), ?, 1)
+       ON DUPLICATE KEY UPDATE pointsTotal = pointsTotal + ?, dateMAJ = NOW()`,
+      [pts, idClient, pts]
+    );
+
+    res.json({ success: true, idCommande: "DS-" + idCommande });
+  } catch (err) {
+    console.log("Order save error:", err);
+    res.json({ success: false, message: "Erreur création commande" });
+  }
+});
+
+/* =========================
+   PRODUCTS  ← noms de colonnes corrigés selon ta vraie DB
+========================= */
+app.get("/api/products", async (req, res) => {
+  try {
+    const rows = await query(`
+      SELECT p.idProduit, p.nom, p.description, p.prix, p.stock,
+             p.image, p.marque, p.noteMoyenne,
+             cat.nom AS categorie,
+             COALESCE(AVG(a.note), 0) AS rating,
+             COUNT(a.idAvis) AS ratingCount
+      FROM produit p
+      LEFT JOIN categorie cat ON cat.idCategorie = p.idCategorie
+      LEFT JOIN avis a ON a.idProduit = p.idProduit AND a.estVisible = 1
+      WHERE p.estDisponible = 1
+      GROUP BY p.idProduit
+      ORDER BY p.idProduit
+    `);
+
+    const products = rows.map(r => ({
+      id: r.idProduit,
+      name: r.nom,
+      cat: r.categorie || "Divers",
+      price: Number(r.prix),
+      oldPrice: null,
+      stock: r.stock > 0,
+      img: r.image || "",
+      badge: null,
+      specs: r.description || "",
+      desc: r.description || "",
+      specItems: {},
+      rating: Math.round(Number(r.rating) * 10) / 10 || 0,
+      ratingCount: Number(r.ratingCount) || 0
+    }));
+
+    res.json({ success: true, products });
+  } catch (err) {
+    console.log("Products error:", err);
+    res.json({ success: false, products: [] });
+  }
+});
+
+/* =========================
+   PRODUCT DETAIL
+========================= */
+app.get("/api/products/:id", async (req, res) => {
+  try {
+    const rows = await query(`
+      SELECT p.idProduit, p.nom, p.description, p.prix, p.stock,
+             p.image, p.marque, cat.nom AS categorie
+      FROM produit p
+      LEFT JOIN categorie cat ON cat.idCategorie = p.idCategorie
+      WHERE p.idProduit = ? AND p.estDisponible = 1
+    `, [req.params.id]);
+
+    if (!rows.length) return res.json({ success: false, message: "Produit introuvable" });
+    const p = rows[0];
+
+    const avisRows = await query(`
+      SELECT a.idAvis, u.prenom AS nom, a.note, a.commentaire, a.dateAvis
+      FROM avis a
+      LEFT JOIN utilisateur u ON u.idUtilisateur = a.idClient
+      WHERE a.idProduit = ? AND a.estVisible = 1
+      ORDER BY a.dateAvis DESC
+      LIMIT 20
+    `, [req.params.id]);
+
+    const reviews = avisRows.map(r => ({
+      idAvis: r.idAvis,
+      name: r.nom || "Anonyme",
+      stars: r.note,
+      date: new Date(r.dateAvis).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
+      text: r.commentaire,
+      helpful: 0
+    }));
+
+    const qRows = await query(`
+      SELECT q.idQuestion, q.texte AS question, q.dateQuestion,
+             u.prenom AS auteur, q.reponse, q.dateReponse
+      FROM question q
+      LEFT JOIN utilisateur u ON u.idUtilisateur = q.idClient
+      WHERE q.idProduit = ?
+      ORDER BY q.dateQuestion DESC
+      LIMIT 10
+    `, [req.params.id]);
+
+    const questions = qRows.map(r => ({
+      q: r.question,
+      a: r.reponse || null,
+      author: r.reponse ? "Support DigitalStore" : r.auteur || "Anonyme",
+      date: new Date(r.dateQuestion).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }),
+      votes: 0
+    }));
+
+    res.json({
+      success: true,
+      product: {
+        id: p.idProduit,
+        name: p.nom,
+        cat: p.categorie || "Divers",
+        price: Number(p.prix),
+        oldPrice: null,
+        stock: p.stock > 0,
+        img: p.image || "",
+        imgs: [p.image || ""],
+        badge: null,
+        specs: p.description || "",
+        desc: p.description || "",
+        specItems: {},
+        reviews,
+        questions
+      }
     });
-  });
+  } catch (err) {
+    console.log("Product detail error:", err);
+    res.json({ success: false, message: "Erreur serveur" });
+  }
+});
+
+/* =========================
+   SUBMIT REVIEW
+========================= */
+app.post("/api/reviews", async (req, res) => {
+  const { idProduit, idUtilisateur, note, commentaire } = req.body;
+  if (!idProduit || !note || !commentaire)
+    return res.json({ success: false, message: "Champs manquants" });
+  try {
+    await query(
+      `INSERT INTO avis (idProduit, idClient, note, commentaire, dateAvis, estVisible)
+       VALUES (?, ?, ?, ?, NOW(), 1)`,
+      [idProduit, idUtilisateur || null, note, commentaire]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.log("Review error:", err);
+    res.json({ success: false, message: "Erreur avis" });
+  }
+});
+
+/* =========================
+   SUBMIT QUESTION
+========================= */
+app.post("/api/questions", async (req, res) => {
+  const { idProduit, idUtilisateur, contenu } = req.body;
+  if (!idProduit || !contenu)
+    return res.json({ success: false, message: "Champs manquants" });
+  try {
+    await query(
+      `INSERT INTO question (idProduit, idClient, texte, dateQuestion, estRepondue)
+       VALUES (?, ?, ?, NOW(), 0)`,
+      [idProduit, idUtilisateur || null, contenu]
+    );
+    res.json({ success: true });
+  } catch (err) {
+    console.log("Question error:", err);
+    res.json({ success: false, message: "Erreur question" });
+  }
+});
+
+/* =========================
+   CATEGORIES
+========================= */
+app.get("/api/categories", async (req, res) => {
+  try {
+    const rows = await query(`
+      SELECT cat.idCategorie, cat.nom,
+             COUNT(p.idProduit) AS nbProduits
+      FROM categorie cat
+      LEFT JOIN produit p ON p.idCategorie = cat.idCategorie AND p.estDisponible = 1
+      GROUP BY cat.idCategorie
+      ORDER BY cat.nom
+    `);
+    res.json({ success: true, categories: rows });
+  } catch (err) {
+    res.json({ success: false, categories: [] });
+  }
 });
 
 /* =========================
@@ -303,9 +465,8 @@ app.post("/api/orders", (req, res) => {
 ========================= */
 app.post("/api/admin/login", async (req, res) => {
   const { email, password } = req.body || {};
-  if (!email || !password) {
+  if (!email || !password)
     return res.status(400).json({ success: false, message: "Champs manquants" });
-  }
 
   if (email === DEFAULT_ADMIN_EMAIL && password === DEFAULT_ADMIN_PASSWORD) {
     const token = createAdminToken(email);
@@ -315,7 +476,6 @@ app.post("/api/admin/login", async (req, res) => {
       token
     });
   }
-
   return res.status(401).json({ success: false, message: "Identifiants admin invalides" });
 });
 
@@ -325,29 +485,21 @@ app.get("/api/admin/data", requireAdminAuth, async (req, res) => {
       "SELECT state_key, state_value FROM admin_state WHERE state_key IN (?)",
       [ADMIN_DATA_KEYS]
     );
-
     const data = {};
     for (const row of rows) {
-      try {
-        data[row.state_key] = JSON.parse(row.state_value);
-      } catch {
-        data[row.state_key] = row.state_value;
-      }
+      try { data[row.state_key] = JSON.parse(row.state_value); }
+      catch { data[row.state_key] = row.state_value; }
     }
-
     res.json({ success: true, data });
-  } catch (error) {
-    console.log("Admin data load error:", error);
+  } catch (err) {
     res.status(500).json({ success: false, message: "Erreur chargement admin" });
   }
 });
 
 app.put("/api/admin/data/:key", requireAdminAuth, async (req, res) => {
   const { key } = req.params;
-  if (!ADMIN_DATA_KEYS.includes(key)) {
-    return res.status(400).json({ success: false, message: "Cle inconnue" });
-  }
-
+  if (!ADMIN_DATA_KEYS.includes(key))
+    return res.status(400).json({ success: false, message: "Clé inconnue" });
   try {
     const payload = JSON.stringify(req.body?.value ?? null);
     await query(
@@ -356,32 +508,11 @@ app.put("/api/admin/data/:key", requireAdminAuth, async (req, res) => {
        ON DUPLICATE KEY UPDATE state_value = VALUES(state_value), updated_at = CURRENT_TIMESTAMP`,
       [key, payload]
     );
-
     res.json({ success: true });
-  } catch (error) {
-    console.log("Admin data save error:", error);
+  } catch (err) {
     res.status(500).json({ success: false, message: "Erreur sauvegarde admin" });
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* =========================
    START SERVER
